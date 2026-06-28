@@ -123,12 +123,15 @@
             min-height: 260px;
             max-height: 500px;
             font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            white-space: pre;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-all;
             background: white;
             color: #333;
             padding: 10px;
             border-radius: 5px;
-            overflow: auto;
+            overflow-y: auto;
+            overflow-x: hidden;
             font-size: 12px;
             line-height: 1.5;
             border: 1px solid #d9d9d9;
@@ -590,7 +593,7 @@
                 <ol>
                     <li>将生成的 <code>sources.json</code> 内容复制到 GitHub 仓库的同名文件</li>
                     <li>提交更改，等待 GitHub Actions 自动执行</li>
-                    <li>访问 RSS 链接：<code>https://用户名.github.io/仓库名/feed-id.xml</code></li>
+                    <li>访问 RSS 链接：<code>https://用户名.github.io/仓库名/feeds/feed-id.xml</code></li>
                 </ol>
             </div>
         </div>
@@ -1000,7 +1003,7 @@
         const feedId = document.getElementById('feedId').value.trim() || 'feed-1';
         if (username && repo) {
             document.getElementById('rssLinkDisplay').value =
-                `https://${username}.github.io/${repo}/${feedId}.xml`;
+                `https://${username}.github.io/${repo}/feeds/${feedId}.xml`;
         } else {
             document.getElementById('rssLinkDisplay').value = '';
         }
