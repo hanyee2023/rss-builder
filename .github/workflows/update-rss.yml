@@ -39,8 +39,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./feeds
-          # 直接发布到 gh-pages 根目录，访问路径为 /feed-id.xml
-          # 如果要 /feeds/feed-id.xml，取消下面一行的注释
-          # destination_dir: feeds
+          publish_dir: ./output
           keep_files: true
