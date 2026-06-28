@@ -1,0 +1,50 @@
+name: Update RSS Feeds
+
+on:
+  # 定时触发 - 每天 UTC 时间 0:00, 6:00, 12:00, 18:00 执行（即北京时间 8:00, 14:00, 20:00, 2:00）
+  schedule:
+    - cron: '0 0,6,12,18 * * *'
+  # 手动触发
+  workflow_dispatch:
+  # 当 sources.json 或 generate.js 变更时触发
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'sources.json'
+      - 'generate.js'
+      - 'package.json'
+      - '.github/workflows/update-rss.yml'
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  generate-rss:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Generate RSS feeds
+        run: node generate.js
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./feeds
+          destination_dir: feeds
+          keep_files: true
