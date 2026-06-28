@@ -1,0 +1,26 @@
+{
+  "name": "rss-builder",
+  "version": "2.0.0",
+  "description": "自定义RSS订阅源生成器 - 从任意网站提取内容生成RSS",
+  "main": "generate.js",
+  "scripts": {
+    "generate": "node generate.js",
+    "start": "node generate.js"
+  },
+  "keywords": [
+    "rss",
+    "feed",
+    "generator",
+    "scraper",
+    "github-actions"
+  ],
+  "author": "RSS Builder",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "dependencies": {},
+  "optionalDependencies": {
+    "iconv-lite": "^0.6.3"
+  }
+}
