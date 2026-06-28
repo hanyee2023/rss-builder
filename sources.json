@@ -2,22 +2,63 @@
   "feeds": [
     {
       "id": "kongquehai",
-      "name": "孔雀海|珍藏合集",
-      "url": "https://www.kq001.cc/cos",
-      "description": "策划",
-      "rule": "<div class=\"item-body flex xx flex1 jsb\"><h2 class=\"item-heading\"><a href=\"{*}\">{*}</a></h2><a class=\"thumb-items\" href=\"{*}\"><span><img src=\"{*}\" data-src=\"{%}\" class=\"lazyload fit-cover radius8\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"{%}\" class=\"lazyload fit-cover radius8\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"{%}\" class=\"lazyload fit-cover radius8\" alt=\"{*}\"></span><span><div class=\"lazyload abs-center right-top\"><badge class=\"lazyload b-black mr6 mt6 em09\"><i class=\"lazyload fa fa-image mr3\" aria-hidden=\"true\"></i>{*}</badge></div><img src=\"{*}\" data-src=\"{%}\" class=\"lazyload fit-cover radius8\" alt=\"{%}\"></span></a><div>",
+      "name": "孔雀海",
+      "url": "https://www.kqqol.com/",
+      "description": "孔雀海最新更新",
+      "rule": "<h2>{%}</h2>\n<a href=\"{%}\">{*}</a>\n<div class=\"content\">{%}</div>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
         "trimContent": true
       },
       "tpl": {
-        "title": "{%5}",
-        "link": "https://www.kq001.cc{%1}",
-        "content": "<img src=\"https://www.kq001.cc{%1}\" width=\"100%\"><img src=\"https://www.kq001.cc{%2}\" width=\"100%\"><img src=\"https://www.kq001.cc{%3}\" width=\"100%\"><img src=\"https://www.kq001.cc{%4}\" width=\"100%\">"
+        "title": "{%1}",
+        "link": "{%2}",
+        "content": "{%3}"
       },
       "maxItems": 50,
-      "updateInterval": "daily"
+      "updateInterval": "daily",
+      "language": "zh-CN"
+    },
+    {
+      "id": "example-news",
+      "name": "示例新闻",
+      "url": "https://example.com/news",
+      "description": "示例新闻订阅源",
+      "rule": "<article class=\"news\">\n  <h3 class=\"title\">{%}</h3>\n  <a href=\"{%}\">{*}</a>\n  <p class=\"summary\">{%}</p>\n</article>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "{%2}",
+        "content": "{%3}"
+      },
+      "maxItems": 30,
+      "updateInterval": "6h",
+      "language": "zh-CN"
+    },
+    {
+      "id": "blog-posts",
+      "name": "某博客最新文章",
+      "url": "https://blog.example.com",
+      "description": "博客最新文章列表",
+      "rule": "<div class=\"post-item\">\n  <h2><a href=\"{%}\">{%}</a></h2>\n  <div class=\"excerpt\">{%}</div>\n</div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "{%1}",
+        "content": "{%3}"
+      },
+      "maxItems": 20,
+      "updateInterval": "daily",
+      "language": "zh-CN"
     }
   ]
 }
