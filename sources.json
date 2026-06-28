@@ -21,11 +21,11 @@
       "language": "zh-CN"
     },
     {
-      "id": "example-news",
-      "name": "示例新闻",
-      "url": "https://example.com/news",
-      "description": "示例新闻订阅源",
-      "rule": "<article class=\"news\">\n  <h3 class=\"title\">{%}</h3>\n  <a href=\"{%}\">{*}</a>\n  <p class=\"summary\">{%}</p>\n</article>",
+      "id": "tiktok",
+      "name": "Tiktok",
+      "url": "https://919129.xyz",
+      "description": "测试02",
+      "rule": "<meta itemprop=\"author\" content=\"lux8pw\" /><meta itemprop=\"name\" content=\"{%}\" /><meta itemprop=\"description\" content=\"{*}\" /><meta itemprop=\"duration\" content=\"{*}\" /><meta itemprop=\"thumbnailUrl\" content=\"{%}\" /><meta itemprop=\"contentURL\" content=\"{%}\" /><meta itemprop=\"uploadDate\" content=\"{*}\" />",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -33,12 +33,11 @@
       },
       "tpl": {
         "title": "{%1}",
-        "link": "{%2}",
-        "content": "{%3}"
+        "link": "{%3}",
+        "content": "<video src=\"{%3}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%2}\"></video>"
       },
-      "maxItems": 30,
-      "updateInterval": "6h",
-      "language": "zh-CN"
+      "maxItems": 50,
+      "updateInterval": "daily"
     },
     {
       "id": "blog-posts",
