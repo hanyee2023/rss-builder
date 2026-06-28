@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title><![CDATA[示例订阅源]]></title>
+  <description><![CDATA[这是一个示例RSS订阅源配置]]></description>
+  <link>https://example.com</link>
+  <lastBuildDate>Sun, 28 Jun 2026 02:45:44 GMT</lastBuildDate>
+  <generator>RSS-Builder/2.0 (Node.js)</generator>
+  <language>zh-CN</language>
+</channel>
+</rss>
