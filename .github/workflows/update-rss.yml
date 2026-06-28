@@ -6,7 +6,7 @@ on:
     - cron: '0 0,6,12,18 * * *'
   # 手动触发
   workflow_dispatch:
-  # 当 sources.json 或 generate.js 变更时触发
+  # 当配置或脚本变更时触发
   push:
     branches:
       - main
@@ -14,12 +14,10 @@ on:
     paths:
       - 'sources.json'
       - 'generate.js'
-      - 'package.json'
       - '.github/workflows/update-rss.yml'
 
 permissions:
   contents: write
-  pages: write
 
 jobs:
   generate-rss:
@@ -33,10 +31,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
 
       - name: Generate RSS feeds
         run: node generate.js
