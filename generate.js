@@ -504,9 +504,10 @@ function buildRssXml({ title, description, link, language, items, tpl, baseUrl }
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n';
     xml += '<channel>\n';
-    xml += `  <title><![CDATA[${escapeCdata(title)}]]></title>\n`;
-    xml += `  <description><![CDATA[${escapeCdata(description)}]]></description>\n`;
+    // title 和 description 使用转义方式（更兼容阅读器），description 如果内容复杂可改用 CDATA
+    xml += `  <title>${escapeXml(title)}</title>\n`;
     xml += `  <link>${escapeXml(link)}</link>\n`;
+    xml += `  <description>${escapeXml(description)}</description>\n`;
     xml += `  <lastBuildDate>${now}</lastBuildDate>\n`;
     xml += `  <generator>RSS-Builder/2.0 (Node.js)</generator>\n`;
     xml += `  <language>${language}</language>\n`;
@@ -529,8 +530,10 @@ function buildRssXml({ title, description, link, language, items, tpl, baseUrl }
         const guid = generateGuid(itemTitle + itemLink + index);
 
         xml += '  <item>\n';
-        xml += `    <title><![CDATA[${escapeCdata(itemTitle)}]]></title>\n`;
+        // title 使用转义方式，兼容性更好
+        xml += `    <title>${escapeXml(itemTitle)}</title>\n`;
         xml += `    <link>${escapeXml(itemLink)}</link>\n`;
+        // description（内容）使用 CDATA，因为可能包含 HTML
         xml += `    <description><![CDATA[${escapeCdata(itemContent)}]]></description>\n`;
         xml += `    <guid isPermaLink="false">${escapeXml(guid)}</guid>\n`;
         xml += `    <pubDate>${new Date(Date.now() - index * 60000).toUTCString()}</pubDate>\n`;
