@@ -1,0 +1,24 @@
+{
+  "feeds": [
+    {
+      "id": "example-feed",
+      "name": "示例订阅源",
+      "url": "https://example.com",
+      "description": "这是一个示例RSS订阅源配置",
+      "rule": "<h2>{%}</h2>\n<a href=\"{%}\">{*}</a>\n<div class=\"content\">{%}</div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "{%2}",
+        "content": "{%3}"
+      },
+      "maxItems": 50,
+      "updateInterval": "daily",
+      "language": "zh-CN"
+    }
+  ]
+}
