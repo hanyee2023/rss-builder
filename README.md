@@ -1,133 +1,176 @@
-# RSS 自定义订阅生成器
+# RSS 自定义订阅生成器 - 完整操作指南
 
-一个可以从任意网站提取内容、自动生成 RSS 订阅源的工具。通过 GitHub Actions 定时运行，实现订阅源自动更新。
+从任意网站提取内容，生成可自动更新的 RSS 订阅源。基于 GitHub Actions 定时运行，无需服务器。
 
-## 功能特点
+## 快速导航
 
-- **可视化规则配置**：通过前端页面可视化配置提取规则，无需写代码
-- **自动更新**：GitHub Actions 定时抓取，RSS 内容自动更新
-- **多订阅源**：支持在一个仓库中管理多个 RSS 订阅源
-- **规则灵活**：使用 `{%}` 提取内容、`{*}` 忽略内容，语法简单直观
-- **前后端一致**：前端预览和后端生成使用完全相同的提取引擎
+- [文件说明](#文件说明)
+- [部署步骤（从零开始）](#部署步骤从零开始)
+- [制作 RSS 订阅的完整流程](#制作-rss-订阅的完整流程)
+- [多订阅源配置](#多订阅源配置)
+- [提取规则编写指南](#提取规则编写指南)
+- [常见问题](#常见问题)
 
-## 文件结构
+---
+
+## 文件说明
+
+| 文件 | 说明 |
+|------|------|
+| `rss-builder.html` | 本地配置工具，在浏览器中打开使用 |
+| `generate.js` | 后端 RSS 生成脚本，GitHub Actions 运行 |
+| `sources.json` | 订阅源配置，所有订阅源都在这里管理 |
+| `.github/workflows/update-rss.yml` | GitHub Actions 自动更新工作流 |
+| `package.json` | Node.js 配置（generate.js 零依赖） |
+| `feeds/` | RSS 输出目录（由 Actions 自动生成到 gh-pages 分支） |
+
+---
+
+## 部署步骤（从零开始）
+
+### 第 1 步：创建 GitHub 仓库
+
+1. 登录 GitHub，点击右上角 **+** → **New repository**
+2. 仓库名随意，比如 `rss-builder`
+3. 选择 **Public**（公开仓库才能免费使用 GitHub Pages）
+4. 勾选 **Add a README file**
+5. 点击 **Create repository**
+
+### 第 2 步：上传必要文件
+
+将以下文件上传到仓库根目录：
+
+- `generate.js`
+- `sources.json`
+- `package.json`
+- `.github/workflows/update-rss.yml`
+
+> 注意：`.github/workflows/` 是目录结构，upload 时选择 **Add file** → **Create new file**，路径填 `.github/workflows/update-rss.yml`
+
+### 第 3 步：启用 GitHub Pages
+
+1. 进入仓库 → **Settings** → **Pages**
+2. **Build and deployment** → **Source** 选择 **Deploy from a branch**
+3. **Branch** 选择 **gh-pages**（第一次运行 Actions 后才会有这个分支）
+4. 目录选择 **/ (root)**
+5. 点击 **Save**
+
+> 如果暂时没有 `gh-pages` 分支，先做第 4 步触发一次运行，再回来设置。
+
+### 第 4 步：手动触发一次运行
+
+1. 进入仓库 → **Actions**
+2. 左侧选择 **Update RSS Feeds**
+3. 点击 **Run workflow** → 选择 **main** 分支 → **Run workflow**
+4. 等待运行完成（约 1-2 分钟）
+
+运行成功后：
+- 会自动创建 `gh-pages` 分支
+- RSS 文件会生成在 `gh-pages` 分支根目录
+
+### 第 5 步：验证
+
+访问你的 RSS 链接，格式：
 
 ```
-.
-├── .github/
-│   └── workflows/
-│       └── update-rss.yml      # GitHub Actions 工作流配置
-├── feeds/                       # 生成的 RSS XML 文件目录（自动创建）
-│   └── *.xml
-├── generate.js                  # RSS 生成脚本（核心）
-├── package.json                 # Node.js 依赖配置
-├── sources.json                 # 订阅源配置文件
-├── rss-builder.html             # 前端配置工具页面
-└── README.md                    # 说明文档
+https://你的用户名.github.io/仓库名/feed-id.xml
 ```
 
-## 快速开始
+例如：`https://hanyee2023.github.io/rss-builder/kongquehai.xml`
 
-### 1. 准备工作
+> 注意：文件在 **gh-pages 分支**，不在 main 分支的 feeds 目录里！
 
-- 一个 GitHub 账号
-- 新建一个公开仓库
+---
 
-### 2. 部署步骤
+## 制作 RSS 订阅的完整流程
 
-1. 将以下文件上传到你的 GitHub 仓库：
-   - `generate.js`
-   - `package.json`
-   - `sources.json`
-   - `.github/workflows/update-rss.yml`
+### 第一步：获取网页源码
 
-2. 在仓库设置中启用 GitHub Pages：
-   - Settings → Pages
-   - Source 选择 `Deploy from a branch`
-   - Branch 选择 `gh-pages` 分支，目录选择 `/ (root)`
+1. 在浏览器中打开 `rss-builder.html`
+2. 在「目标网站地址」输入要生成 RSS 的网页 URL
+3. 点击「解析源码」按钮
+   - 如果解析失败，选择「手动粘贴」模式：
+     - 打开目标网页，按 **F12** 打开开发者工具
+     - 在 Elements 面板中，右键最外层 `<html>` 标签 → **Copy** → **Copy outerHTML**
+     - 粘贴到源码区域
 
-3. 使用 `rss-builder.html` 配置你的订阅源：
-   - 在浏览器中打开 `rss-builder.html`
-   - 按四步操作生成 `sources.json`
-   - 将生成的内容替换仓库中的 `sources.json`
+### 第二步：编写提取规则
 
-4. 提交更改后，GitHub Actions 会自动运行：
-   - 在 Actions 标签页可以查看运行状态
-   - 首次运行后会创建 `gh-pages` 分支
+这是最关键的一步。规则语法：
 
-### 3. 访问 RSS
+| 符号 | 含义 |
+|------|------|
+| `{%}` | 提取内容（按出现顺序编号为 {%1} {%2} {%3}...） |
+| `{*}` | 忽略内容（通配符，匹配任意内容） |
 
-部署成功后，RSS 订阅链接格式为：
+**编写方法：**
 
-```
-https://你的用户名.github.io/仓库名/feeds/feed-id.xml
-```
+1. 从源码中找到包含目标内容的一段 HTML 结构
+2. 复制这段代码到规则输入框
+3. 把要提取的内容替换为 `{%}`
+4. 把会变化的内容替换为 `{*}`
+5. 其余部分保持不变（作为定位锚点）
+6. 点击「提取内容」按钮验证是否正确
 
-例如：`https://john.github.io/my-rss/feeds/tech-news.xml`
+**示例：**
 
-## 提取规则语法
-
-### 基本语法
-
-| 符号 | 含义 | 说明 |
-|------|------|------|
-| `{%}` | 提取内容 | 标记需要提取的部分，按顺序编号为 {%1}, {%2}, {%3}... |
-| `{*}` | 忽略内容 | 标记可变/不需要的部分，匹配任意内容（非贪婪） |
-
-### 规则编写步骤
-
-1. 在浏览器中打开目标网页，按 F12 打开开发者工具
-2. 找到包含目标内容的 HTML 结构
-3. 复制一段包含目标内容的 HTML 代码
-4. 将需要提取的内容替换为 `{%}`
-5. 将可能变化的内容替换为 `{*}`
-6. 保持其余部分不变（作为定位锚点）
-
-### 示例
-
-假设网页源码如下：
-
+源码片段：
 ```html
-<div class="article">
+<div class="post">
   <h2 class="title">文章标题</h2>
-  <a href="/article/123.html" class="link">阅读全文</a>
-  <div class="summary">文章摘要内容...</div>
-  <span class="date">2024-01-01</span>
+  <a href="/post/123.html">阅读全文</a>
+  <p class="summary">文章摘要内容</p>
 </div>
 ```
 
-提取规则可以写为：
-
+提取规则：
 ```
-<div class="article">
-  <h2 class="title">{%}</h2>
-  <a href="{%}" class="link">{*}</a>
-  <div class="summary">{%}</div>
+<h2 class="title">{%}</h2>
+<a href="{%}">{*}</a>
+<p class="summary">{%}</p>
 ```
 
 提取结果（3个字段）：
 - `{%1}` = 文章标题
-- `{%2}` = /article/123.html
-- `{%3}` = 文章摘要内容...
+- `{%2}` = /post/123.html
+- `{%3}` = 文章摘要内容
 
-### 注意事项
+> 💡 **技巧**：尽量选择独特的、不会重复的 HTML 结构作为锚点。class 名、标签名越具体越好。
 
-- 规则中的固定文本（HTML标签、类名等）必须与源码**完全一致**
-- 尽量选择足够独特的锚点，避免匹配到不相关的内容
-- `{*}` 是**非贪婪**匹配，会尽可能短地匹配
-- 如果提取结果为空或不对，尝试调整规则的起止位置
+### 第三步：配置 RSS 信息
 
-## sources.json 配置说明
+1. 填写「订阅源名称」和「描述」
+2. 配置模板：
+   - **条目标题模板**：每条 RSS 条目的标题，用 `{%1}` 等引用提取的字段
+   - **条目链接模板**：每条 RSS 条目的链接，支持相对路径（自动补全）
+   - **条目内容模板**：每条 RSS 条目的正文，支持 HTML
+3. 设置 **Feed ID**（比如 `kongquehai`、`tech-news`），这会作为 RSS 文件名
+4. 填写 GitHub 用户名和仓库名（自动生成订阅链接）
+5. 点击「生成 RSS」按钮预览效果
+
+### 第四步：生成并部署
+
+1. 点击「生成 sources.json」按钮
+2. 点击「复制 JSON」或「下载 sources.json」
+3. 将内容粘贴/上传到 GitHub 仓库的 `sources.json` 文件
+4. 提交更改，GitHub Actions 会自动运行
+5. 等待 1-2 分钟后，访问生成的 RSS 链接
+
+---
+
+## 多订阅源配置
+
+`sources.json` 支持多个订阅源，格式如下：
 
 ```json
 {
   "feeds": [
     {
       "id": "feed-1",
-      "name": "订阅源名称",
-      "url": "https://example.com",
-      "description": "订阅源描述",
-      "rule": "提取规则文本",
+      "name": "订阅源1名称",
+      "url": "https://site1.com",
+      "description": "描述1",
+      "rule": "提取规则1",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -141,6 +184,26 @@ https://你的用户名.github.io/仓库名/feeds/feed-id.xml
       "maxItems": 50,
       "updateInterval": "daily",
       "language": "zh-CN"
+    },
+    {
+      "id": "feed-2",
+      "name": "订阅源2名称",
+      "url": "https://site2.com",
+      "description": "描述2",
+      "rule": "提取规则2",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "{%2}",
+        "content": "{%3}"
+      },
+      "maxItems": 30,
+      "updateInterval": "6h",
+      "language": "zh-CN"
     }
   ]
 }
@@ -148,77 +211,164 @@ https://你的用户名.github.io/仓库名/feeds/feed-id.xml
 
 ### 字段说明
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `id` | string | 是 | 订阅源唯一标识，用于生成文件名 |
-| `name` | string | 是 | 订阅源名称，显示在 RSS 中 |
-| `url` | string | 是 | 目标网页 URL |
-| `description` | string | 否 | 订阅源描述 |
-| `rule` | string | 是 | 提取规则 |
-| `options.stripHtml` | boolean | 否 | 是否去除 HTML 标签，默认 true |
-| `options.decodeEntities` | boolean | 否 | 是否解码 HTML 实体，默认 true |
-| `options.trimContent` | boolean | 否 | 是否去除首尾空白，默认 true |
-| `tpl.title` | string | 否 | 条目标题模板，默认 `{%1}` |
-| `tpl.link` | string | 否 | 条目链接模板，默认 `{%2}` |
-| `tpl.content` | string | 否 | 条目内容模板，默认 `{%3}` |
-| `maxItems` | number | 否 | 最大条目数，默认 50 |
-| `language` | string | 否 | 语言，默认 zh-CN |
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `id` | ✅ | 唯一标识，同时作为 RSS 文件名（如 `id: "news"` → `news.xml`） |
+| `name` | ✅ | 订阅源名称，显示在 RSS 阅读器中 |
+| `url` | ✅ | 目标网页 URL |
+| `description` | - | 订阅源描述 |
+| `rule` | ✅ | 提取规则 |
+| `options.stripHtml` | - | 是否去除 HTML 标签，默认 true |
+| `options.decodeEntities` | - | 是否解码 HTML 实体，默认 true |
+| `options.trimContent` | - | 是否去除首尾空白，默认 true |
+| `tpl.title` | - | 标题模板，默认 `{%1}` |
+| `tpl.link` | - | 链接模板，默认 `{%2}` |
+| `tpl.content` | - | 内容模板，默认 `{%3}` |
+| `maxItems` | - | 最大条目数，默认 50 |
+| `language` | - | 语言，默认 zh-CN |
 
-## 自定义更新频率
+### 添加新订阅源的步骤
 
-修改 `.github/workflows/update-rss.yml` 中的 cron 表达式：
+1. 用 `rss-builder.html` 配置好新的订阅源
+2. 生成并复制 JSON
+3. 打开 GitHub 仓库的 `sources.json`
+4. 在 `feeds` 数组中添加新的配置对象（注意逗号分隔）
+5. 提交保存
 
-```yaml
-schedule:
-  - cron: '0 0,6,12,18 * * *'  # 每6小时一次
+---
+
+## 提取规则编写指南
+
+### 基本原则
+
+1. **锚点要独特**：固定部分（非 `{%}` 和 `{*}` 的部分）要足够独特，避免匹配到错误的位置
+2. **锚点要稳定**：选择网站不会轻易改动的结构（如 class 名、标签层级）
+3. **`{*}` 要够用**：可能变化的内容都用 `{*}` 代替，避免因微小变化导致提取失败
+4. **`{%}` 数量要清楚**：数清楚有几个 `{%}`，对应 `{%1}` `{%2}`...
+
+### 常见场景
+
+#### 场景 1：提取列表中的标题和链接
+
+```html
+<ul class="news-list">
+  <li><a href="/article/1.html">新闻标题1</a></li>
+  <li><a href="/article/2.html">新闻标题2</a></li>
+</ul>
 ```
 
-常用 cron 表达式：
+规则：
+```
+<li><a href="{%}">{%}</a></li>
+```
 
-| 频率 | cron 表达式 (UTC) | 对应北京时间 |
-|------|-------------------|-------------|
-| 每小时 | `0 * * * *` | 每小时 |
-| 每6小时 | `0 0,6,12,18 * * *` | 8点, 14点, 20点, 2点 |
-| 每天 | `0 0 * * *` | 每天 8:00 |
-| 每天两次 | `0 0,12 * * *` | 8:00, 20:00 |
+结果：
+- `{%1}` = 链接地址
+- `{%2}` = 标题
 
-> 注意：cron 使用 UTC 时间，北京时间 = UTC + 8 小时
+#### 场景 2：提取包含图片的内容
+
+```html
+<div class="item">
+  <img src="/thumb/1.jpg" class="thumb">
+  <h3>标题文字</h3>
+  <p>摘要内容...</p>
+</div>
+```
+
+规则：
+```
+<img src="{%}" class="thumb">
+<h3>{%}</h3>
+<p>{%}</p>
+```
+
+如果想在内容模板中保留图片，关闭「去除HTML标签」选项，并把规则写成：
+```
+<div class="item">
+  {*}
+  <h3>{%}</h3>
+  <p>{%}</p>
+</div>
+```
+
+然后在内容模板中手动拼接图片：
+```
+<img src="{%1}">
+<p>{%3}</p>
+```
+
+#### 场景 3：内容中有换行和空格
+
+源码中的换行和空格要与规则**完全一致**。如果不确定，可以只取一行或用 `{*}` 代替空白部分。
+
+### 调试技巧
+
+1. **先短后长**：先用一小段规则测试，确认能匹配到，再逐步扩大范围
+2. **对照检查**：提取失败时，把规则和源码并排对比，检查是否有细微差别（空格、换行、引号类型）
+3. **浏览器辅助**：F12 开发者工具的 Elements 面板中，右键元素 → **Copy** → **Copy outerHTML**，粘贴后再修改
+
+---
 
 ## 常见问题
 
-### Q: 为什么提取不到内容？
+### Q: Actions 显示成功，但 RSS 链接 404？
 
-A: 可能原因：
-1. 规则与实际源码不完全匹配（注意空格、换行、引号类型）
+A: 检查以下几点：
+1. 确认 GitHub Pages 已启用，且选择了 **gh-pages** 分支
+2. RSS 文件在 **gh-pages 分支**，不在 main 分支
+3. 链接格式：`https://用户名.github.io/仓库名/feed-id.xml`（没有 `/feeds/` 前缀）
+4. 首次部署后可能需要等几分钟才能访问
+
+### Q: 提取不到内容怎么办？
+
+A: 常见原因：
+1. 规则与源码不完全匹配（空格、换行、引号类型等）
 2. 网站内容是 JavaScript 动态渲染的（此工具只能获取初始 HTML）
-3. 网站有反爬机制，拒绝了 GitHub Actions 的请求
+3. 规则太长，中间包含了太多可变内容
+4. 解决方法：缩短规则，用更多 `{*}` 代替可变部分
 
 ### Q: 支持 JavaScript 渲染的页面吗？
 
-A: 当前版本不支持。如果目标网站内容是 JS 动态渲染的，需要使用 Puppeteer/Playwright 等无头浏览器方案。
+A: 当前版本不支持。如果目标网站是 SPA（React/Vue 等），需要使用 Puppeteer 等无头浏览器方案。
 
-### Q: 一个仓库可以放多个订阅源吗？
+### Q: 更新频率可以自定义吗？
 
-A: 可以。在 `sources.json` 的 `feeds` 数组中添加多个配置即可，每个 feed 有独立的 id 和输出文件。
+A: 可以。修改 `.github/workflows/update-rss.yml` 中的 cron 表达式。GitHub Actions 的最短间隔是 5 分钟，但不建议太频繁。
 
-### Q: GitHub Actions 运行失败怎么办？
+常用 cron 示例（UTC 时间，北京时间 = UTC + 8）：
 
-A: 查看 Actions 标签页的运行日志，检查：
-1. `sources.json` 格式是否正确（可用 JSON 校验工具检查）
-2. 目标网站是否可访问
-3. 提取规则是否正确
+| 频率 | cron 表达式 | 对应北京时间 |
+|------|------------|-------------|
+| 每小时 | `0 * * * *` | 每小时 |
+| 每6小时 | `0 0,6,12,18 * * *` | 8点, 14点, 20点, 2点 |
+| 每天早上 | `0 0 * * *` | 每天 8:00 |
+| 每天早晚 | `0 0,12 * * *` | 8:00, 20:00 |
 
-### Q: 如何手动触发更新？
+### Q: 一个仓库最多可以有多少个订阅源？
 
-A: 在仓库的 Actions 页面，选择 "Update RSS Feeds" 工作流，点击 "Run workflow" 按钮即可手动触发。
+A: 没有硬性限制。但如果订阅源太多，单次运行时间可能超过 GitHub Actions 的免费时长限制（公开仓库每月 2000 分钟）。建议 10-20 个以内比较稳妥。
 
-## 技术实现
+### Q: 如何查看 RSS 是否正常工作？
 
-- **前端**：纯 HTML/JS，无需后端，可本地打开使用
-- **后端**：Node.js 脚本，零依赖（可选 iconv-lite 用于编码转换）
+A: 几种方法：
+1. 直接在浏览器中打开 RSS 链接，看是否显示 XML 内容
+2. 用 RSS 阅读器（如 Feedly、Inoreader、NetNewsWire）添加订阅
+3. 在线 RSS 验证工具：https://validator.w3.org/feed/
+
+### Q: 订阅源管理在哪里？
+
+A: 所有订阅源都在 `sources.json` 文件中管理。直接编辑这个文件即可添加、修改、删除订阅源。GitHub 仓库是唯一的数据源。
+
+---
+
+## 技术说明
+
+- **前端**：纯 HTML/JS，零依赖，本地浏览器运行
+- **后端**：Node.js 脚本，仅使用内置模块，零依赖
 - **部署**：GitHub Actions + GitHub Pages
-- **提取引擎**：基于正则表达式的规则匹配，前后端共用同一逻辑
+- **提取引擎**：基于正则表达式，前后端使用完全相同的逻辑
 
 ## 许可证
 
-MIT License
+MIT
