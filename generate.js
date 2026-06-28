@@ -3,6 +3,7 @@
  * RSS Feed Generator
  * 
  * 从 sources.json 中读取订阅源配置，抓取网页，提取内容，生成 RSS XML 文件。
+ * 同时生成订阅源索引页 index.html，方便查看和管理所有订阅源。
  * 
  * 【重要】此文件中的提取规则引擎必须与前端 rss-builder.html 中的
  * extractWithRule 函数逻辑完全一致，以确保前后端提取结果相同。
@@ -18,7 +19,8 @@ const { URL } = require('url');
 // 配置
 // ============================================================
 const SOURCES_FILE = path.join(__dirname, 'sources.json');
-const OUTPUT_DIR = path.join(__dirname, 'feeds');
+const OUTPUT_DIR = path.join(__dirname, 'output');
+const FEEDS_DIR = path.join(OUTPUT_DIR, 'feeds');
 const DEFAULT_USER_AGENT = 'Mozilla/5.0 (compatible; RSS-Builder/2.0; +https://github.com/)';
 
 // ============================================================
@@ -38,9 +40,9 @@ async function main() {
     console.log(`找到 ${sources.feeds.length} 个订阅源`);
 
     // 2. 确保输出目录存在
-    if (!fs.existsSync(OUTPUT_DIR)) {
-        fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-        console.log(`创建输出目录: ${OUTPUT_DIR}`);
+    if (!fs.existsSync(FEEDS_DIR)) {
+        fs.mkdirSync(FEEDS_DIR, { recursive: true });
+        console.log(`创建输出目录: ${FEEDS_DIR}`);
     }
 
     // 3. 逐个生成 RSS
@@ -50,7 +52,7 @@ async function main() {
         try {
             const result = await generateFeed(feed);
             results.push(result);
-            console.log(`  ✓ 成功: 生成 ${result.itemCount} 条记录 -> ${result.filename}`);
+            console.log(`  ✓ 成功: 生成 ${result.itemCount} 条记录 -> feeds/${result.filename}`);
         } catch (err) {
             console.error(`  ✗ 失败: ${err.message}`);
             results.push({
@@ -62,7 +64,11 @@ async function main() {
         }
     }
 
-    // 4. 输出汇总
+    // 4. 生成索引页
+    generateIndexPage(results);
+    console.log('\n✓ 索引页已生成: index.html');
+
+    // 5. 输出汇总
     console.log('\n=== 生成汇总 ===');
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
@@ -73,7 +79,6 @@ async function main() {
         results.filter(r => !r.success).forEach(r => {
             console.log(`  - ${r.name || r.id}: ${r.error}`);
         });
-        // 有失败也不退出非零码，避免影响其他成功的feed
     }
 
     console.log('\n=== 完成 ===');
@@ -110,15 +115,9 @@ async function generateFeed(feed) {
         language = 'zh-CN',
     } = feed;
 
-    if (!id) {
-        throw new Error('缺少 feed id');
-    }
-    if (!url) {
-        throw new Error('缺少目标 url');
-    }
-    if (!rule) {
-        throw new Error('缺少提取规则 rule');
-    }
+    if (!id) throw new Error('缺少 feed id');
+    if (!url) throw new Error('缺少目标 url');
+    if (!rule) throw new Error('缺少提取规则 rule');
 
     // 1. 抓取网页
     const html = await fetchPage(url);
@@ -145,17 +144,170 @@ async function generateFeed(feed) {
 
     // 4. 写入文件
     const filename = `${id}.xml`;
-    const filePath = path.join(OUTPUT_DIR, filename);
+    const filePath = path.join(FEEDS_DIR, filename);
     fs.writeFileSync(filePath, rssXml, 'utf-8');
 
     return {
         id,
         name,
+        description,
+        url,
         success: true,
         itemCount: extractedData.length,
         filename,
         filePath,
     };
+}
+
+// ============================================================
+// 生成索引页
+// ============================================================
+function generateIndexPage(results) {
+    const successFeeds = results.filter(r => r.success);
+    const failFeeds = results.filter(r => !r.success);
+    const generatedAt = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' });
+
+    const html = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS 订阅源列表</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        h1 {
+            font-size: 24px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .feed-list {
+            list-style: none;
+        }
+        .feed-item {
+            padding: 16px;
+            border: 1px solid #e4e7ed;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+        .feed-item:hover {
+            border-color: #1677ff;
+            box-shadow: 0 2px 8px rgba(22,119,255,0.1);
+        }
+        .feed-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        .feed-desc {
+            font-size: 13px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+        .feed-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #bfbfbf;
+            margin-bottom: 10px;
+        }
+        .feed-link {
+            display: inline-block;
+            padding: 5px 14px;
+            background: #e6f7ff;
+            color: #1677ff;
+            border-radius: 4px;
+            font-size: 12px;
+            text-decoration: none;
+            font-family: 'Consolas', monospace;
+            word-break: break-all;
+        }
+        .feed-link:hover {
+            background: #bae7ff;
+        }
+        .feed-failed {
+            border-color: #ffccc7;
+            background: #fff2f0;
+        }
+        .feed-failed .feed-name {
+            color: #ff4d4f;
+        }
+        .error-msg {
+            color: #ff4d4f;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+        .footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e9ecef;
+            font-size: 12px;
+            color: #bfbfbf;
+            text-align: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .badge-success { background: #f6ffed; color: #52c41a; }
+        .badge-error { background: #fff2f0; color: #ff4d4f; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RSS 订阅源列表 <span class="badge badge-success">${successFeeds.length} 个在线</span></h1>
+        <p class="subtitle">共 ${results.length} 个订阅源 &middot; 生成时间: ${generatedAt}</p>
+
+        <ul class="feed-list">
+${successFeeds.map(feed => `            <li class="feed-item">
+                <div class="feed-name">${escapeHtml(feed.name)} <span class="badge badge-success">${feed.itemCount} 条</span></div>
+                <div class="feed-desc">${escapeHtml(feed.description || '')}</div>
+                <div class="feed-meta">
+                    <span>来源: ${escapeHtml(feed.url)}</span>
+                </div>
+                <a class="feed-link" href="feeds/${feed.filename}">feeds/${feed.filename}</a>
+            </li>`).join('\n')}
+${failFeeds.length > 0 ? failFeeds.map(feed => `            <li class="feed-item feed-failed">
+                <div class="feed-name">${escapeHtml(feed.name)} <span class="badge badge-error">失败</span></div>
+                <div class="error-msg">错误: ${escapeHtml(feed.error || '')}</div>
+            </li>`).join('\n') : ''}
+        </ul>
+
+        <div class="footer">
+            RSS-Builder &middot; 自动生成于 ${generatedAt}
+        </div>
+    </div>
+</body>
+</html>`;
+
+    fs.writeFileSync(path.join(OUTPUT_DIR, 'index.html'), html, 'utf-8');
 }
 
 // ============================================================
@@ -210,7 +362,6 @@ function fetchPage(url) {
                     if (charset === 'utf-8' || charset === 'utf8') {
                         html = buffer.toString('utf-8');
                     } else {
-                        // 尝试用 iconv-lite 转换，如果没有则用utf-8
                         try {
                             const iconv = require('iconv-lite');
                             html = iconv.decode(buffer, charset);
@@ -248,8 +399,7 @@ function extractWithRule(html, rule, options = {}) {
     } = options;
 
     // 将规则转换为正则表达式
-    // 1. 先转义规则中的正则特殊字符（除了我们自己的占位符中的 %）
-    //    注意：{ } * 都是正则特殊字符，会被转义；% 不是，不会被转义
+    // 1. 先转义规则中的正则特殊字符（% 不是正则特殊字符，不会被转义）
     let escapedRule = rule
         .replace(/[-\/\\^$*+.?()|[\]{}]/g, '\\$&'); // 转义所有正则特殊字符
 
@@ -419,6 +569,15 @@ function escapeXml(text) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&apos;');
+}
+
+function escapeHtml(text) {
+    return (text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 }
 
 function generateGuid(str) {
