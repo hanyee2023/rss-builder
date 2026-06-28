@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS 订阅源列表</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        h1 {
+            font-size: 24px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .subtitle {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .feed-list {
+            list-style: none;
+        }
+        .feed-item {
+            padding: 16px;
+            border: 1px solid #e4e7ed;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+        .feed-item:hover {
+            border-color: #1677ff;
+            box-shadow: 0 2px 8px rgba(22,119,255,0.1);
+        }
+        .feed-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #262626;
+            margin-bottom: 4px;
+        }
+        .feed-desc {
+            font-size: 13px;
+            color: #8c8c8c;
+            margin-bottom: 8px;
+        }
+        .feed-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: #bfbfbf;
+            margin-bottom: 10px;
+        }
+        .feed-link {
+            display: inline-block;
+            padding: 5px 14px;
+            background: #e6f7ff;
+            color: #1677ff;
+            border-radius: 4px;
+            font-size: 12px;
+            text-decoration: none;
+            font-family: 'Consolas', monospace;
+            word-break: break-all;
+        }
+        .feed-link:hover {
+            background: #bae7ff;
+        }
+        .feed-failed {
+            border-color: #ffccc7;
+            background: #fff2f0;
+        }
+        .feed-failed .feed-name {
+            color: #ff4d4f;
+        }
+        .error-msg {
+            color: #ff4d4f;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+        .footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e9ecef;
+            font-size: 12px;
+            color: #bfbfbf;
+            text-align: center;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .badge-success { background: #f6ffed; color: #52c41a; }
+        .badge-error { background: #fff2f0; color: #ff4d4f; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>RSS 订阅源列表 <span class="badge badge-success">1 个在线</span></h1>
+        <p class="subtitle">共 1 个订阅源 &middot; 生成时间: 2026/6/28 12:35:52</p>
+
+        <ul class="feed-list">
+            <li class="feed-item">
+                <div class="feed-name">孔雀海|珍藏合集 <span class="badge badge-success">10 条</span></div>
+                <div class="feed-desc">策划</div>
+                <div class="feed-meta">
+                    <span>来源: https://www.kq001.cc/cos</span>
+                </div>
+                <a class="feed-link" href="feeds/kongquehai.xml">feeds/kongquehai.xml</a>
+            </li>
+
+        </ul>
+
+        <div class="footer">
+            RSS-Builder &middot; 自动生成于 2026/6/28 12:35:52
+        </div>
+    </div>
+</body>
+</html>
