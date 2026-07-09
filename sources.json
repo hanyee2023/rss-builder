@@ -1,20 +1,20 @@
 {
   "feeds": [
    {
-      "id": "kongquehai",
-      "name": "孔雀海",
-      "url": "https://www.kq001.cc/cos",
-      "description": "网红COS",
-      "rule": "<div class=\"item-body flex xx flex1 jsb\"><h2 class=\"item-heading\"><a href=\"https://www.kq001.cc/{%}\">{%} – {*}</a></h2><a class=\"thumb-items\" href=\"https://www.kq001.cc/{*}\"><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><div class=\"{*}\"><badge class=\"{*}\"><i class=\"{*}\" aria-hidden=\"true\"></i>{*}</badge></div><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span></a><div>",
+      "id": "meizhitu",
+      "name": "美之图",
+      "url": "https://kkmzt.com/photo/",
+      "description": "影视平面图",
+      "rule": "<a class=\"uk-inline u-thumb-v\" href=\"{%}\"><img width=\"640\" height=\"960\" data-src=\"{*}\" data-srcset=\"{%}\" alt=\"{%}\" uk-img=\"\" src=\"{*}\"></a>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
         "trimContent": true
       },
       "tpl": {
-        "title": "{%2}",
-        "link": "https://www.kq001.cc/{%1}",
-        "content": "<img src=\"https://www.kq001.cc/wp-content/uploads/{%3}.jpg\" width=\"100%\">\n<img src=\"https://www.kq001.cc/wp-content/uploads/{%4}.jpg\" width=\"100%\">\n<img src=\"https://www.kq001.cc/wp-content/uploads/{%5}.jpg\" width=\"100%\">\n<img src=\"https://www.kq001.cc/wp-content/uploads/{%6}.jpg\" width=\"100%\">"
+        "title": "{%3}",
+        "link": "{%1}",
+        "content": "<img src=\"{%2}\" width=\"100%\">"
       },
       "maxItems": 50,
       "updateInterval": "6h"
@@ -39,11 +39,11 @@
       "updateInterval": "daily"
     },
     {
-      "id": "maomi",
-      "name": "猫咪",
-      "url": "https://4595e9.top/#/",
-      "description": "社区热门贴图",
-      "rule": "<div data-v-{*}\"\" class=\"information_message\">{%}</div></div> <div data-v-{*}\"\" class=\"text\"></div> <div data-v-{*}\"\" class=\"details_img\"><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"{*}\" lazy=\"loading\"></div></div>",
+      "id": "xiannvshe",
+      "name": "仙女社",
+      "url": "https://n1p1.com/",
+      "description": "影视平面图",
+      "rule": "<div class=\"img\">\n        <a href=\"{*}\" title=\"{%} [{*}]\" target=\"_blank\" rel=\"bookmark\">\n        <img src=\"{*}\" data-src=\"{%}\" class=\"thumb\" alt=\"{*}\">\n                </a>\n    </div>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -52,7 +52,7 @@
       "tpl": {
         "title": "{%1}",
         "link": "{%2}",
-        "content": "<img src=\"{%2}\" width=\"100%\">\n<img src=\"{%3}\" width=\"100%\">\n<img src=\"{%4}\" width=\"100%\">\n<img src=\"{%5}\" width=\"100%\">\n<img src=\"{%6}\" width=\"100%\">\n<img src=\"{%7}\" width=\"100%\">\n<img src=\"{%8}\" width=\"100%\">\n<img src=\"{%9}\" width=\"100%\">"
+        "content": "<img src=\"{%2}\" width=\"100%\">"
       },
       "maxItems": 50,
       "updateInterval": "6h"
