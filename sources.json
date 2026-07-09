@@ -56,25 +56,6 @@
       },
       "maxItems": 50,
       "updateInterval": "6h"
-    },
-    {
-      "id": "tom",
-      "name": "Twitter@Tom",
-      "url": "https://zamantika.com/profile/18ajgg",
-      "description": "推特订阅",
-      "rule": "<div class=\"{*} tweet-text\">{%}</div>{*}<video src=\"{%}\" poster=\"{%}\" class=\"{*}\" muted=\"\" playsinline=\"\" preload=\"metadata\"></video>",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%1}",
-        "link": "{%2}",
-        "content": "<video src=\"{%2}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%3}\"></video>"
-      },
-      "maxItems": 50,
-      "updateInterval": "daily"
     }
   ]
 }
