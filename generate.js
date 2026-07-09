@@ -68,7 +68,10 @@ async function main() {
     generateIndexPage(results);
     console.log('\n✓ 索引页已生成: index.html');
 
-    // 5. 输出汇总
+    // 5. 复制在线生成器
+    copyRssBuilder();
+
+    // 6. 输出汇总
     console.log('\n=== 生成汇总 ===');
     const successCount = results.filter(r => r.success).length;
     const failCount = results.filter(r => !r.success).length;
@@ -278,12 +281,54 @@ function generateIndexPage(results) {
         }
         .badge-success { background: #f6ffed; color: #52c41a; }
         .badge-error { background: #fff2f0; color: #ff4d4f; }
+        .builder-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: #f0f7ff;
+            border: 1px solid #d6e9ff;
+            border-radius: 8px;
+        }
+        .builder-bar-text {
+            font-size: 13px;
+            color: #4a6fa5;
+        }
+        .builder-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #1677ff;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .builder-btn:hover {
+            background: #4096ff;
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(22,119,255,0.2);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>RSS 订阅源列表 <span class="badge badge-success">${successFeeds.length} 个在线</span></h1>
         <p class="subtitle">共 ${results.length} 个订阅源 &middot; 生成时间: ${generatedAt}</p>
+
+        <div class="builder-bar">
+            <span class="builder-bar-text">在线配置新订阅源，无需安装任何工具</span>
+            <a href="rss-builder.html" class="builder-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                新建 RSS 订阅源
+            </a>
+        </div>
 
         <ul class="feed-list">
 ${successFeeds.map(feed => `            <li class="feed-item">
@@ -591,6 +636,21 @@ function generateGuid(str) {
         hash = hash & hash;
     }
     return 'item-' + Math.abs(hash).toString(36);
+}
+
+// ============================================================
+// 复制在线生成器到输出目录
+// ============================================================
+function copyRssBuilder() {
+    const sourceFile = path.join(__dirname, 'rss-builder.html');
+    const targetFile = path.join(OUTPUT_DIR, 'rss-builder.html');
+
+    if (fs.existsSync(sourceFile)) {
+        fs.copyFileSync(sourceFile, targetFile);
+        console.log('✓ 在线生成器已复制: rss-builder.html');
+    } else {
+        console.warn('⚠ 未找到 rss-builder.html，跳过复制');
+    }
 }
 
 // ============================================================
