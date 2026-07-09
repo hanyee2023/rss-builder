@@ -136,6 +136,13 @@ async function generateFeed(feed) {
 
     if (extractedData.length === 0) {
         console.warn('  警告: 没有提取到任何内容，将生成空feed');
+        // 输出 HTML 片段供调试：前 2000 字符，帮助对比规则是否匹配
+        console.log('  --- HTML 片段（前 2000 字符）---');
+        console.log(html.substring(0, 2000));
+        console.log('  --- HTML 片段结束 ---');
+        console.log(`  --- 使用的规则 ---`);
+        console.log(rule);
+        console.log('  --- 规则结束 ---');
     }
 
     // 3. 生成 RSS XML
