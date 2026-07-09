@@ -752,16 +752,29 @@
     }
 
     async function fetchViaProxy(url) {
-        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 20000);
-        try {
-            const response = await fetch(proxyUrl, { signal: controller.signal });
-            if (!response.ok) throw new Error(`代理HTTP ${response.status}`);
-            return await response.text();
-        } finally {
-            clearTimeout(timeoutId);
+        const proxies = [
+            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+            `https://corsproxy.io/?${encodeURIComponent(url)}`,
+            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
+        ];
+
+        for (const proxyUrl of proxies) {
+            try {
+                console.log(`尝试代理: ${proxyUrl}`);
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+                const response = await fetch(proxyUrl, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error(`代理HTTP ${response.status}`);
+                const text = await response.text();
+                if (text && text.trim().length > 10) return text;
+                throw new Error('代理返回内容为空');
+            } catch (err) {
+                console.warn(`代理失败: ${err.message}`);
+                continue; // 尝试下一个代理
+            }
         }
+        throw new Error('所有代理均不可用');
     }
 
     function clearSource() {
