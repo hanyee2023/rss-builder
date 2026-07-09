@@ -17,7 +17,9 @@
         "content": "<img src=\"{%2}\" width=\"100%\">"
       },
       "maxItems": 50,
-      "updateInterval": "6h"
+      "updateInterval": "6h",
+      "language": "zh-CN",
+      "proxy": true
     },
     {
       "id": "tiktok",
@@ -36,7 +38,8 @@
         "content": "<video src=\"{%3}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%2}\"></video>"
       },
       "maxItems": 50,
-      "updateInterval": "daily"
+      "updateInterval": "6h",
+      "language": "zh-CN"
     },
     {
       "id": "xiannvshe",
@@ -55,7 +58,8 @@
         "content": "<img src=\"{%2}\" width=\"100%\">"
       },
       "maxItems": 50,
-      "updateInterval": "6h"
+      "updateInterval": "6h",
+      "language": "zh-CN"
     }
   ]
 }
