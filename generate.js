@@ -45,12 +45,12 @@ async function main() {
         console.log(`创建输出目录: ${FEEDS_DIR}`);
     }
 
-    // 3. 逐个生成 RSS
+    // 3. 逐个生成 RSS（每个最多 60 秒，超时自动跳过）
     const results = [];
     for (const feed of sources.feeds) {
         console.log(`\n--- 处理: ${feed.name || feed.id} ---`);
         try {
-            const result = await generateFeed(feed);
+            const result = await withTimeout(generateFeed(feed), 60000, `处理超时（超过 60 秒）`);
             results.push(result);
             console.log(`  ✓ 成功: 生成 ${result.itemCount} 条记录 -> feeds/${result.filename}`);
         } catch (err) {
@@ -639,17 +639,44 @@ function generateGuid(str) {
 }
 
 // ============================================================
+// Promise 超时包装
+// ============================================================
+function withTimeout(promise, ms, message) {
+    return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+            reject(new Error(message));
+        }, ms);
+        promise.then((result) => {
+            clearTimeout(timer);
+            resolve(result);
+        }).catch((err) => {
+            clearTimeout(timer);
+            reject(err);
+        });
+    });
+}
+
+// ============================================================
 // 复制在线生成器到输出目录
 // ============================================================
 function copyRssBuilder() {
-    const sourceFile = path.join(__dirname, 'rss-builder.html');
-    const targetFile = path.join(OUTPUT_DIR, 'rss-builder.html');
+    // 优先找 rss-builder.html，找不到则回退到 index.html
+    const candidates = ['rss-builder.html', 'index.html'];
+    let copied = false;
 
-    if (fs.existsSync(sourceFile)) {
-        fs.copyFileSync(sourceFile, targetFile);
-        console.log('✓ 在线生成器已复制: rss-builder.html');
-    } else {
-        console.warn('⚠ 未找到 rss-builder.html，跳过复制');
+    for (const filename of candidates) {
+        const sourceFile = path.join(__dirname, filename);
+        if (fs.existsSync(sourceFile)) {
+            const targetFile = path.join(OUTPUT_DIR, 'rss-builder.html');
+            fs.copyFileSync(sourceFile, targetFile);
+            console.log(`✓ 在线生成器已复制: ${filename} → rss-builder.html`);
+            copied = true;
+            break;
+        }
+    }
+
+    if (!copied) {
+        console.warn('⚠ 未找到 rss-builder.html 或 index.html，跳过复制在线生成器');
     }
 }
 
