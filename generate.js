@@ -13,6 +13,7 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const http = require('http');
+const zlib = require('zlib');
 const { URL } = require('url');
 
 // ============================================================
@@ -21,7 +22,9 @@ const { URL } = require('url');
 const SOURCES_FILE = path.join(__dirname, 'sources.json');
 const OUTPUT_DIR = path.join(__dirname, 'output');
 const FEEDS_DIR = path.join(OUTPUT_DIR, 'feeds');
-const DEFAULT_USER_AGENT = 'Mozilla/5.0 (compatible; RSS-Builder/2.0; +https://github.com/)';
+
+// 使用真实 Chrome 浏览器的 User-Agent，最大程度模拟真实浏览器
+const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
 
 // ============================================================
 // 主函数
@@ -356,9 +359,9 @@ ${failFeeds.length > 0 ? failFeeds.map(feed => `            <li class="feed-item
 }
 
 // ============================================================
-// 抓取网页
+// 抓取网页 - 最大程度模拟真实 Chrome 浏览器
 // ============================================================
-function fetchPage(url) {
+function fetchPage(url, retryCount = 0) {
     return new Promise((resolve, reject) => {
         const parsedUrl = new URL(url);
         const client = parsedUrl.protocol === 'https:' ? https : http;
@@ -370,8 +373,20 @@ function fetchPage(url) {
             method: 'GET',
             headers: {
                 'User-Agent': DEFAULT_USER_AGENT,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Sec-Ch-Ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+                'Sec-Ch-Ua-Mobile': '?0',
+                'Sec-Ch-Ua-Platform': '"Windows"',
+                'Sec-Fetch-Dest': 'document',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-Site': 'none',
+                'Sec-Fetch-User': '?1',
+                'Upgrade-Insecure-Requests': '1',
+                'Connection': 'keep-alive',
             },
             timeout: 30000,
         };
@@ -381,13 +396,32 @@ function fetchPage(url) {
             if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
                 const redirectUrl = new URL(res.headers.location, url).href;
                 console.log(`  重定向到: ${redirectUrl}`);
-                fetchPage(redirectUrl).then(resolve).catch(reject);
+                fetchPage(redirectUrl, retryCount).then(resolve).catch(reject);
                 return;
             }
 
             if (res.statusCode !== 200) {
+                // 对于 403/429 等可能反爬的状态码，尝试重试
+                if ((res.statusCode === 403 || res.statusCode === 429) && retryCount < 2) {
+                    console.log(`  HTTP ${res.statusCode}，${2 - retryCount} 秒后重试...`);
+                    setTimeout(() => {
+                        fetchPage(url, retryCount + 1).then(resolve).catch(reject);
+                    }, 2000);
+                    return;
+                }
                 reject(new Error(`HTTP ${res.statusCode}`));
                 return;
+            }
+
+            // 处理压缩
+            const encoding = res.headers['content-encoding'];
+            let stream = res;
+            if (encoding === 'gzip') {
+                stream = res.pipe(zlib.createGunzip());
+            } else if (encoding === 'deflate') {
+                stream = res.pipe(zlib.createInflate());
+            } else if (encoding === 'br') {
+                stream = res.pipe(zlib.createBrotliDecompress());
             }
 
             // 处理编码
@@ -399,14 +433,15 @@ function fetchPage(url) {
             }
 
             const chunks = [];
-            res.on('data', (chunk) => chunks.push(chunk));
-            res.on('end', () => {
+            stream.on('data', (chunk) => chunks.push(chunk));
+            stream.on('end', () => {
                 const buffer = Buffer.concat(chunks);
                 try {
                     let html;
                     if (charset === 'utf-8' || charset === 'utf8') {
                         html = buffer.toString('utf-8');
-                    } else {
+                    } else if (charset === 'gbk' || charset === 'gb2312') {
+                        // GBK/GB2312 使用 iconv-lite
                         try {
                             const iconv = require('iconv-lite');
                             html = iconv.decode(buffer, charset);
@@ -414,18 +449,38 @@ function fetchPage(url) {
                             console.warn(`  警告: 无法解码 ${charset}，使用 utf-8`);
                             html = buffer.toString('utf-8');
                         }
+                    } else {
+                        html = buffer.toString('utf-8');
                     }
                     resolve(html);
                 } catch (err) {
                     reject(err);
                 }
             });
+            stream.on('error', reject);
         });
 
-        req.on('error', reject);
+        req.on('error', (err) => {
+            if (retryCount < 2) {
+                console.log(`  请求失败: ${err.message}，${2 - retryCount} 秒后重试...`);
+                setTimeout(() => {
+                    fetchPage(url, retryCount + 1).then(resolve).catch(reject);
+                }, 2000);
+            } else {
+                reject(err);
+            }
+        });
+
         req.on('timeout', () => {
             req.destroy();
-            reject(new Error('请求超时 (30s)'));
+            if (retryCount < 2) {
+                console.log(`  请求超时，${2 - retryCount} 秒后重试...`);
+                setTimeout(() => {
+                    fetchPage(url, retryCount + 1).then(resolve).catch(reject);
+                }, 2000);
+            } else {
+                reject(new Error('请求超时 (30s)，已重试 2 次'));
+            }
         });
 
         req.end();
