@@ -14,6 +14,7 @@ on:
     paths:
       - 'sources.json'
       - 'generate.js'
+      - 'rss-builder.html'
       - '.github/workflows/update-rss.yml'
 
 permissions:
