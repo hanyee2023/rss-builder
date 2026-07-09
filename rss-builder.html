@@ -515,6 +515,12 @@
                     <input type="text" id="feedId" placeholder="feed-1" value="feed-1">
                 </div>
             </div>
+            <div class="checkbox-group" style="margin-top: 4px;">
+                <label class="checkbox-item">
+                    <input type="checkbox" id="useProxy">
+                    <span>使用代理（网站返回 403 时启用）</span>
+                </label>
+            </div>
 
             <!-- GitHub配置 -->
             <div class="gh-config">
@@ -587,7 +593,8 @@
         &quot;content&quot;: &quot;{%3}&quot;
       },
       &quot;maxItems&quot;: 50,
-      &quot;updateInterval&quot;: &quot;daily&quot;
+      &quot;updateInterval&quot;: &quot;daily&quot;,
+      &quot;proxy&quot;: false
     }
   ]
 }</div>
@@ -984,6 +991,7 @@
             tpl: { title: tplTitle, link: tplLink, content: tplContent },
             maxItems: maxItems,
             updateInterval: document.getElementById('updateInterval').value,
+            proxy: document.getElementById('useProxy').checked,
         };
 
         updateRssLinkDisplay();
