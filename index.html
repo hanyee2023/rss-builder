@@ -138,6 +138,9 @@
             resize: vertical;
             width: 100%;
         }
+        textarea.source-code-area {
+            height: 300px;
+        }
         .rule-area { min-height: 110px; }
         .preview-area { min-height: 180px; max-height: 380px; }
         .content-template-area { min-height: 100px; }
@@ -414,7 +417,7 @@
                 <div class="status-text">源码长度: <span id="sourceLength">0</span> 字符</div>
                 <div id="parseStatus"></div>
             </div>
-            <div class="source-code-area" id="sourceHtml">等待解析或手动粘贴HTML源码...</div>
+            <textarea class="source-code-area" id="sourceHtml" placeholder="等待解析或手动粘贴HTML源码..."></textarea>
         </div>
 
         <!-- 第二步：提取规则 -->
@@ -632,6 +635,7 @@
         // 第一步
         document.getElementById('parseBtn').addEventListener('click', parseSource);
         document.getElementById('clearSourceBtn').addEventListener('click', clearSource);
+        document.getElementById('sourceHtml').addEventListener('input', onSourceInput);
 
         // 第二步
         document.getElementById('extractBtn').addEventListener('click', extractContent);
@@ -704,7 +708,7 @@
 
         if (success) {
             state.currentSource = html;
-            document.getElementById('sourceHtml').textContent = html;
+            document.getElementById('sourceHtml').value = html;
             updateSourceLength();
             setStatus('parseStatus', '解析成功 ✓', 'status-success');
             autoFillFromHtml(html, url);
@@ -712,7 +716,12 @@
             setStatus('parseStatus', `解析失败: ${errorMsg}`, 'status-error');
             alert(
                 `无法获取网页源码：${errorMsg}\n\n` +
-                `建议：选择「手动粘贴」模式，从浏览器F12中复制源码粘贴到源码区域。`
+                `原因：浏览器的安全限制（CORS）禁止网页直接请求第三方网站。\n\n` +
+                `解决方法：\n` +
+                `1. 打开目标网页，按 F12 → Elements\n` +
+                `2. 右键 <html> 标签 → Copy → Copy outerHTML\n` +
+                `3. 将源码粘贴到下方「源码内容」框中\n\n` +
+                `然后继续第 2 步填写提取规则即可。`
             );
         }
     }
@@ -749,18 +758,26 @@
     }
 
     function clearSource() {
-        document.getElementById('sourceHtml').textContent = '等待解析或手动粘贴HTML源码...';
+        document.getElementById('sourceHtml').value = '';
         state.currentSource = '';
         updateSourceLength();
         setStatus('parseStatus', '', '');
     }
 
+    function onSourceInput() {
+        updateSourceLength();
+        const text = document.getElementById('sourceHtml').value.trim();
+        if (text.length > 0) {
+            setStatus('parseStatus', '已手动粘贴源码 ✓', 'status-success');
+        } else {
+            setStatus('parseStatus', '', '');
+        }
+    }
+
     function updateSourceLength() {
-        const text = document.getElementById('sourceHtml').textContent || '';
-        const placeholder = '等待解析或手动粘贴HTML源码...';
-        const actual = text === placeholder ? '' : text;
-        state.currentSource = actual;
-        document.getElementById('sourceLength').textContent = actual.length.toLocaleString();
+        const text = document.getElementById('sourceHtml').value || '';
+        state.currentSource = text;
+        document.getElementById('sourceLength').textContent = text.length.toLocaleString();
     }
 
     function autoFillFromHtml(html, url) {
