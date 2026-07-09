@@ -119,6 +119,7 @@ async function generateFeed(feed) {
         tpl = { title: '{%1}', link: '{%2}', content: '{%3}' },
         maxItems = 50,
         language = 'zh-CN',
+        proxy = false,
     } = feed;
 
     if (!id) throw new Error('缺少 feed id');
@@ -126,7 +127,7 @@ async function generateFeed(feed) {
     if (!rule) throw new Error('缺少提取规则 rule');
 
     // 1. 抓取网页
-    const html = await fetchPage(url);
+    const html = await fetchPage(url, 0, proxy);
     console.log(`  抓取完成，源码长度: ${html.length} 字符`);
 
     // 2. 提取内容
@@ -360,8 +361,101 @@ ${failFeeds.length > 0 ? failFeeds.map(feed => `            <li class="feed-item
 
 // ============================================================
 // 抓取网页 - 最大程度模拟真实 Chrome 浏览器
+// 支持 proxy 参数：true 使用默认代理，字符串使用自定义代理
 // ============================================================
-function fetchPage(url, retryCount = 0) {
+function fetchPage(url, retryCount = 0, proxy = false) {
+    if (proxy) {
+        return fetchWithProxy(url, retryCount, proxy);
+    }
+    return fetchDirect(url, retryCount);
+}
+
+// ============================================================
+// 通过代理抓取 - 解决 403 等 IP 封禁问题
+// ============================================================
+function fetchWithProxy(url, retryCount = 0, proxyConfig) {
+    const proxyUrl = typeof proxyConfig === 'string' && proxyConfig.length > 0
+        ? proxyConfig
+        : 'https://api.allorigins.win/raw?url=';
+
+    const fullUrl = proxyUrl + encodeURIComponent(url);
+
+    return new Promise((resolve, reject) => {
+        const parsedUrl = new URL(fullUrl);
+        const client = parsedUrl.protocol === 'https:' ? https : http;
+
+        const options = {
+            hostname: parsedUrl.hostname,
+            port: parsedUrl.port || (parsedUrl.protocol === 'https:' ? 443 : 80),
+            path: parsedUrl.pathname + parsedUrl.search,
+            method: 'GET',
+            headers: {
+                'User-Agent': DEFAULT_USER_AGENT,
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'Accept-Encoding': 'gzip, deflate',
+            },
+            timeout: 30000,
+        };
+
+        const req = client.request(options, (res) => {
+            if (res.statusCode !== 200) {
+                if (retryCount < 2) {
+                    console.log(`  (代理) HTTP ${res.statusCode}，${2 - retryCount} 秒后重试...`);
+                    setTimeout(() => {
+                        fetchWithProxy(url, retryCount + 1, proxyConfig).then(resolve).catch(reject);
+                    }, 2000);
+                    return;
+                }
+                reject(new Error(`(代理) HTTP ${res.statusCode}`));
+                return;
+            }
+
+            const encoding = res.headers['content-encoding'];
+            let stream = res;
+            if (encoding === 'gzip') stream = res.pipe(zlib.createGunzip());
+            else if (encoding === 'deflate') stream = res.pipe(zlib.createInflate());
+
+            const chunks = [];
+            stream.on('data', (chunk) => chunks.push(chunk));
+            stream.on('end', () => {
+                const buffer = Buffer.concat(chunks);
+                resolve(buffer.toString('utf-8'));
+            });
+            stream.on('error', reject);
+        });
+
+        req.on('error', (err) => {
+            if (retryCount < 2) {
+                console.log(`  (代理) 请求失败: ${err.message}，${2 - retryCount} 秒后重试...`);
+                setTimeout(() => {
+                    fetchWithProxy(url, retryCount + 1, proxyConfig).then(resolve).catch(reject);
+                }, 2000);
+            } else {
+                reject(err);
+            }
+        });
+
+        req.on('timeout', () => {
+            req.destroy();
+            if (retryCount < 2) {
+                console.log(`  (代理) 请求超时，${2 - retryCount} 秒后重试...`);
+                setTimeout(() => {
+                    fetchWithProxy(url, retryCount + 1, proxyConfig).then(resolve).catch(reject);
+                }, 2000);
+            } else {
+                reject(new Error('(代理) 请求超时'));
+            }
+        });
+
+        req.end();
+    });
+}
+
+// ============================================================
+// 直接抓取网页
+// ============================================================
+function fetchDirect(url, retryCount = 0) {
     return new Promise((resolve, reject) => {
         const parsedUrl = new URL(url);
         const client = parsedUrl.protocol === 'https:' ? https : http;
