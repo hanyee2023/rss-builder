@@ -16,6 +16,14 @@ const http = require('http');
 const zlib = require('zlib');
 const { URL } = require('url');
 
+// Puppeteer 用于浏览器渲染抓取（可选，当 proxy === 'puppeteer' 时启用）
+let puppeteer = null;
+try {
+    puppeteer = require('puppeteer');
+} catch (e) {
+    // puppeteer 未安装，跳过
+}
+
 // ============================================================
 // 配置
 // ============================================================
@@ -371,10 +379,55 @@ ${failFeeds.length > 0 ? failFeeds.map(feed => `            <li class="feed-item
 // 支持 proxy 参数：true 使用默认代理，字符串使用自定义代理
 // ============================================================
 function fetchPage(url, retryCount = 0, proxy = false) {
+    if (proxy === 'puppeteer') {
+        return fetchWithPuppeteer(url);
+    }
     if (proxy) {
         return fetchWithProxy(url, retryCount, proxy);
     }
     return fetchDirect(url, retryCount);
+}
+
+// ============================================================
+// 浏览器渲染抓取 - 使用 Puppeteer 启动真实 Chromium
+// 能拿到 JS 渲染后的完整 HTML，和 F12 结果一致
+// ============================================================
+async function fetchWithPuppeteer(targetUrl) {
+    if (!puppeteer) {
+        throw new Error('Puppeteer 未安装。请在 GitHub Actions 中添加 npm install puppeteer 步骤。');
+    }
+
+    const start = Date.now();
+    let browser;
+
+    try {
+        browser = await puppeteer.launch({
+            headless: 'new',
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
+
+        const page = await browser.newPage();
+        await page.setViewport({ width: 1280, height: 800 });
+
+        // 导航并等待网络空闲（JS 执行完成）
+        await page.goto(targetUrl, {
+            waitUntil: 'networkidle2',
+            timeout: 30000,
+        });
+
+        // 额外等待，确保延迟加载的内容也渲染完成
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        const html = await page.content();
+        await browser.close();
+
+        const elapsed = Date.now() - start;
+        console.log(`  Puppeteer 抓取完成: ${html.length} 字符, ${elapsed}ms`);
+        return html;
+    } catch (err) {
+        if (browser) await browser.close().catch(() => {});
+        throw new Error(`Puppeteer 抓取失败: ${err.message}`);
+    }
 }
 
 // ============================================================
