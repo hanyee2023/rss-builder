@@ -834,7 +834,7 @@
 
         // 第四步
         document.getElementById('workerUrl').addEventListener('input', saveWorkerUrl);
-        document.getElementById('refreshListBtn').addEventListener('click', () => renderFeedList());
+        document.getElementById('refreshListBtn').addEventListener('click', () => { cachedExistingFeeds = null; renderFeedList(); });
         document.getElementById('generateJsonBtn').addEventListener('click', () => generateJsonConfig(true));
         document.getElementById('copyJsonBtn').addEventListener('click', copyJsonConfig);
         document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonConfig);
@@ -861,20 +861,27 @@
     // 第二步：提取内容 - 核心规则引擎
     // 【重要】此函数逻辑必须与后端 generate.js 中的 extractWithRule 完全一致
     // ============================================================
-    function extractContent() {
+    async function extractContent() {
         const html = state.currentSource;
         const ruleText = document.getElementById('ruleInput').value.trim();
 
         if (!html) { alert('请先粘贴网页源码'); return; }
         if (!ruleText) { alert('请填写提取规则'); return; }
 
+        const btn = document.getElementById('extractBtn');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span>提取中...';
+        setStatus('extractStatus', '<span class="loading"></span>正在提取内容...', '');
+
+        // 用 setTimeout 让 UI 先更新，避免阻塞
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         const options = {
             stripHtml: document.getElementById('stripHtml').checked,
             decodeEntities: document.getElementById('decodeEntities').checked,
             trimContent: document.getElementById('trimContent').checked,
         };
-
-        setStatus('extractStatus', '<span class="loading"></span>正在提取内容...', '');
 
         try {
             const result = extractWithRule(html, ruleText, options);
@@ -900,11 +907,22 @@
             console.error('提取错误:', error);
             setStatus('extractStatus', `提取失败: ${error.message}`, 'status-error');
             alert('提取失败：' + error.message + '\n\n请检查规则格式是否正确。');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
     }
 
     function extractWithRule(html, rule, options = {}) {
         const { stripHtml = true, decodeEntities = true, trimContent = true } = options;
+
+        // 安全限制：HTML 太大时截断处理
+        const MAX_HTML_SIZE = 500000; // 500KB
+        let safeHtml = html;
+        if (html.length > MAX_HTML_SIZE) {
+            console.warn(`HTML 过大 (${html.length} 字符)，截断到 ${MAX_HTML_SIZE} 字符处理`);
+            safeHtml = html.substring(0, MAX_HTML_SIZE);
+        }
 
         let escapedRule = rule
             .replace(/[-\/\\^$*+.?()|[\]{}]/g, '\\$&');
@@ -913,12 +931,46 @@
             .replace(/\\\{\\\*\\\}/g, '[\\s\\S]*?')
             .replace(/\\\{%\\\}/g, '([\\s\\S]*?)');
 
-        const regex = new RegExp(regStr, 'g');
+        // 安全限制：规则太长时拒绝执行
+        if (regStr.length > 10000) {
+            throw new Error('提取规则过长，请简化规则');
+        }
+
+        let regex;
+        try {
+            regex = new RegExp(regStr, 'g');
+        } catch (e) {
+            throw new Error('规则格式错误，无法生成正则表达式');
+        }
+
         const results = [];
         let match;
+        let iterations = 0;
+        const MAX_ITERATIONS = 2000; // 最多匹配 2000 次
+        const startTime = Date.now();
+        const MAX_TIME = 5000; // 最多执行 5 秒
 
-        while ((match = regex.exec(html)) !== null) {
-            if (match[0].length === 0) { regex.lastIndex++; continue; }
+        while ((match = regex.exec(safeHtml)) !== null) {
+            iterations++;
+
+            // 超时检查
+            if (Date.now() - startTime > MAX_TIME) {
+                console.warn('提取超时，已返回部分结果');
+                break;
+            }
+
+            // 迭代次数检查
+            if (iterations > MAX_ITERATIONS) {
+                console.warn('匹配次数过多，已返回部分结果');
+                break;
+            }
+
+            // 空匹配保护
+            if (match[0].length === 0) {
+                regex.lastIndex++;
+                continue;
+            }
+
             const row = [];
             for (let i = 1; i < match.length; i++) {
                 let val = match[i] != null ? match[i] : '';
@@ -1132,7 +1184,8 @@
 
     // 从 GitHub 读取已有的订阅源列表（带缓存）
     async function fetchExistingFeeds(forceRefresh = false) {
-        if (!forceRefresh && cachedExistingFeeds) {
+        // 只要有缓存就用缓存，不强制刷新
+        if (cachedExistingFeeds) {
             return cachedExistingFeeds;
         }
 
@@ -1141,14 +1194,13 @@
         if (!ghUsername || !ghRepo) return [];
 
         try {
-            // 加时间戳避免 GitHub raw 缓存
             const ghFileUrl = `https://raw.githubusercontent.com/${ghUsername}/${ghRepo}/main/sources.json?t=${Date.now()}`;
             const resp = await fetch(ghFileUrl);
             if (resp.ok) {
                 const existing = await resp.json();
                 if (existing.feeds && Array.isArray(existing.feeds)) {
-                    cachedExistingFeeds = existing.feeds;
-                    return existing.feeds;
+                    cachedExistingFeeds = JSON.parse(JSON.stringify(existing.feeds)); // 深拷贝
+                    return cachedExistingFeeds;
                 }
             }
         } catch (e) {
@@ -1166,8 +1218,8 @@
         document.getElementById('jsonPreview').textContent = JSON.stringify(singleConfig, null, 2);
 
         if (appendMode) {
-            // 追加模式：读取已有列表并合并（强制刷新缓存）
-            const existingFeeds = await fetchExistingFeeds(true);
+            // 从缓存读取已有列表（不强制刷新 GitHub）
+            const existingFeeds = await fetchExistingFeeds(false);
             const newId = state.currentFeedConfig.id;
             const existIdx = existingFeeds.findIndex(f => f.id === newId);
             if (existIdx >= 0) {
@@ -1175,6 +1227,7 @@
             } else {
                 existingFeeds.push(state.currentFeedConfig);
             }
+            // 更新缓存
             cachedExistingFeeds = existingFeeds;
             state.currentJsonConfig = { feeds: existingFeeds };
 
@@ -1324,9 +1377,8 @@
         btn.disabled = false;
         btn.innerHTML = '一键保存并生成 RSS';
 
-        // 保存成功后刷新管理列表
+        // 保存成功后刷新管理列表（直接用本地缓存，不再重新请求 GitHub）
         if (progress.className.includes('success')) {
-            cachedExistingFeeds = null; // 清除缓存
             renderFeedList();
         }
     }
@@ -1412,7 +1464,10 @@
             const data = await resp.json();
 
             if (data.success) {
-                cachedExistingFeeds = null; // 清除缓存
+                // 从本地缓存移除，不重新请求 GitHub
+                if (cachedExistingFeeds) {
+                    cachedExistingFeeds = cachedExistingFeeds.filter(f => f.id !== feedId);
+                }
                 renderFeedList();
                 alert(`已删除订阅源「${feedId}」，正在重新生成 RSS...`);
                 // 触发 Actions 重新生成
