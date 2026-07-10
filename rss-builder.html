@@ -399,11 +399,12 @@
                 <div class="form-group" style="flex: 1; min-width: 140px;">
                     <label for="proxyMode">解析方式</label>
                     <select id="proxyMode">
-                        <option value="auto">自动（推荐）</option>
-                        <option value="direct">直接请求</option>
+                        <option value="backend">模拟后端（推荐，与Actions一致）</option>
                         <option value="proxy">代理请求</option>
+                        <option value="direct">直接请求</option>
                         <option value="manual">手动粘贴</option>
                     </select>
+                    <div class="info-message">「模拟后端」使用和 GitHub Actions 相同的代理抓取，确保前后端 HTML 一致</div>
                 </div>
             </div>
             <div class="btn-container">
@@ -703,6 +704,7 @@
             try {
                 if (mode === 'direct') html = await fetchDirect(url);
                 else if (mode === 'proxy') html = await fetchViaProxy(url);
+                else if (mode === 'backend') html = await fetchLikeBackend(url);
                 if (html && html.trim().length > 0) { success = true; break; }
             } catch (err) {
                 errorMsg = err.message;
@@ -717,7 +719,8 @@
             state.currentSource = html;
             document.getElementById('sourceHtml').value = html;
             updateSourceLength();
-            setStatus('parseStatus', '解析成功 ✓', 'status-success');
+            const modeLabel = { backend: '模拟后端', proxy: '代理请求', direct: '直接请求' }[proxyMode] || proxyMode;
+            setStatus('parseStatus', `解析成功（${modeLabel}模式）✓ — 源码 ${html.length.toLocaleString()} 字符`, 'status-success');
             autoFillFromHtml(html, url);
         } else {
             setStatus('parseStatus', `解析失败: ${errorMsg}`, 'status-error');
@@ -775,6 +778,28 @@
             }
         }
         throw new Error('所有代理均不可用');
+    }
+
+    // 模拟后端抓取 - 使用和 generate.js 完全相同的代理
+    // 后端默认用 api.allorigins.win，前端也用这个，确保 HTML 一致
+    async function fetchLikeBackend(url) {
+        const backendProxy = 'https://api.allorigins.win/raw?url=';
+        const proxyUrl = backendProxy + encodeURIComponent(url);
+        console.log('模拟后端抓取:', proxyUrl);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        try {
+            const response = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            if (!text || text.trim().length < 10) throw new Error('返回内容为空');
+            return text;
+        } catch (err) {
+            clearTimeout(timeoutId);
+            throw new Error(`模拟后端抓取失败: ${err.message}（与 GitHub Actions 使用相同代理，如果失败说明代理不可用）`);
+        }
     }
 
     function clearSource() {
