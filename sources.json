@@ -279,6 +279,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "laowangzhenxuan",
+      "name": "老王甄选",
+      "url": "https://laowanggebi3333.xyz/",
+      "description": "写真话本",
+      "rule": "<div class=\"wp-block-template-part\">\n{*}<img decoding=\"async\" loading=\"lazy\" src=\"{%}\" width=\"{*}\" height=\"{*}\" class=\"external-img wp-post-image \"></a></figure>{*}\n<div class=\"{*}\" style=\"padding-left:10px\"><h2 style=\"font-size:15px;font-style:normal;font-weight:500;\" class=\"{*}\"><a href=\"{*}\" target=\"_self\">{%}</a></h2><style scoped=\"\">{*}</style></div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "{%1}",
+        "content": "<img src=\"{%1}\" width=\"250\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
