@@ -159,6 +159,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": false
+    },
+    {
+      "id": "sanding69",
+      "name": "Twitter@三丁 成都",
+      "url": "https://zamantika.com/profile/sanding69",
+      "description": "视频分享",
+      "rule": "<div class=\"{*} tweet-text\">{%}</div>{*}<video src=\"{%}\" poster=\"{%}\" class=\"{*}\" muted=\"\" playsinline=\"\" preload=\"metadata\"></video>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "{%2}",
+        "content": "<video src=\"{%2}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%3}\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
