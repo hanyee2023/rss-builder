@@ -39,6 +39,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "孔雀海",
+      "name": "RSS Feed",
+      "url": "https://www.kq001.cc/cos",
+      "description": "RSS Feed",
+      "rule": "<div class=\"item-body flex xx flex1 jsb\"><h2 class=\"item-heading\"><a href=\"https://www.kq001.cc/{%}\">{%} – {*}</a></h2><a class=\"thumb-items\" href=\"https://www.kq001.cc/{*}\"><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><div class=\"{*}\"><badge class=\"{*}\"><i class=\"{*}\" aria-hidden=\"true\"></i>{*}</badge></div><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span></a><div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "https://www.kq001.cc/{%1}",
+        "content": "<img src=\"https://www.kq001.cc/wp-content/uploads/{%3}.jpg\" width=\"100%\">\n<img src=\"https://www.kq001.cc/wp-content/uploads/{%4}.jpg\" width=\"100%\">\n<img src=\"https://www.kq001.cc/wp-content/uploads/{%5}.jpg\" width=\"100%\">\n<img src=\"https://www.kq001.cc/wp-content/uploads/{%6}.jpg\" width=\"100%\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
