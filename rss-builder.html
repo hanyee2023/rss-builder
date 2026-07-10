@@ -923,7 +923,7 @@
             tpl: { title: tplTitle, link: tplLink, content: tplContent },
             maxItems: maxItems,
             updateInterval: document.getElementById('updateInterval').value,
-            proxy: document.getElementById('useProxy').checked,
+            proxy: document.getElementById('useProxy').checked ? 'puppeteer' : false,
         };
 
         updateRssLinkDisplay();
