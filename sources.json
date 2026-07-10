@@ -59,6 +59,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "chuchouquan",
+      "name": "Twitter@除臭犬",
+      "url": "https://carryfeed.com/?url=chuchouquan",
+      "description": "视频分享",
+      "rule": "<article class=\"profile-feed-item\"><div class=\"profile-feed-author\">{*}</div><p>{%}</p>{*}<img src=\"https://pbs.twimg.com/{%}_thumb/{%}/img/{%}.jpg\" alt=\"Media preview\">{*}<a class=\"profile-feed-media-download\" href=\"/download?url=https%3A%2F%2Fvideo.twimg.com%2F{*}%2F{*}%2Fvid%2Favc1%2F{%}%2F{*}.mp4%3Ftag%3D{*}&amp;filename={%}.mp4\" aria-label=\"Download media 1\">{*}</a></div></div></article>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4",
+        "content": "<video src=\"https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://pbs.twimg.com/{%2}_thumb/{%3}/img/{%4}.jpg\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
