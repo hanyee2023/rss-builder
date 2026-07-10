@@ -375,6 +375,133 @@
             margin-top: 6px;
         }
         .note li { margin-bottom: 3px; }
+
+        /* 后端配置警告横幅 */
+        .config-warning {
+            background: #fff7e6;
+            border: 1px solid #ffc53d;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #ad6800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .config-warning:hover {
+            background: #fff1d6;
+            border-color: #ffab00;
+        }
+        .config-warning.hidden {
+            display: none;
+        }
+        .config-warning-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+        .config-warning-text {
+            flex: 1;
+        }
+
+        /* 可折叠后端配置面板 */
+        .backend-config {
+            background: #f0f5ff;
+            border: 1px solid #adc6ff;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .backend-config-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            cursor: pointer;
+            background: #e6f0ff;
+            border-bottom: 1px solid #adc6ff;
+            user-select: none;
+        }
+        .backend-config-header:hover {
+            background: #d6e8ff;
+        }
+        .backend-config-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #1a56db;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .backend-config-arrow {
+            font-size: 12px;
+            color: #1a56db;
+            transition: transform 0.2s;
+        }
+        .backend-config-arrow.collapsed {
+            transform: rotate(-90deg);
+        }
+        .backend-config-body {
+            padding: 16px 18px;
+            transition: max-height 0.3s ease;
+        }
+        .backend-config-body.collapsed {
+            display: none;
+        }
+        .backend-config-body .form-row {
+            margin-bottom: 10px;
+        }
+        .backend-config-body .info-message {
+            margin-top: 8px;
+        }
+        .btn-test {
+            background: #722ed1;
+            color: white;
+        }
+        .btn-test:hover {
+            background: #9254de;
+        }
+
+        /* 一键保存按钮 */
+        .btn-save-trigger {
+            background: linear-gradient(135deg, #52c41a, #389e0d);
+            color: white;
+            font-size: 14px;
+            padding: 10px 20px;
+        }
+        .btn-save-trigger:hover {
+            background: linear-gradient(135deg, #73d13d, #52c41a);
+        }
+
+        /* 保存进度区域 */
+        .save-progress {
+            margin-top: 10px;
+            padding: 12px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            line-height: 1.6;
+            display: none;
+        }
+        .save-progress.active {
+            display: block;
+        }
+        .save-progress.info {
+            background: #e6f7ff;
+            border: 1px solid #91d5ff;
+            color: #0050b3;
+        }
+        .save-progress.success {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #237804;
+        }
+        .save-progress.error {
+            background: #fff2f0;
+            border: 1px solid #ffccc7;
+            color: #a8071a;
+        }
     </style>
 </head>
 <body>
@@ -382,6 +509,40 @@
         <div class="header">
             <h1>RSS 自定义订阅生成器</h1>
             <p>四步生成可自动更新的 RSS 订阅源 &middot; 基于 GitHub Actions</p>
+        </div>
+
+        <!-- 配置提示横幅 -->
+        <div class="config-warning" id="configWarning" onclick="toggleBackendConfig()">
+            <span class="config-warning-icon">⚠️</span>
+            <span class="config-warning-text">请先配置后端地址（点击展开配置面板）</span>
+        </div>
+
+        <!-- 后端配置（可折叠） -->
+        <div class="backend-config" id="backendConfig">
+            <div class="backend-config-header" onclick="toggleBackendConfig()">
+                <div class="backend-config-title">
+                    <span>🔧</span> 后端配置（Cloudflare Worker）
+                </div>
+                <span class="backend-config-arrow" id="configArrow">▼</span>
+            </div>
+            <div class="backend-config-body" id="configBody">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 2;">
+                        <label for="workerUrl">Worker 地址</label>
+                        <input type="text" id="workerUrl" placeholder="https://rss-builder-proxy.你的子域.workers.dev">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="githubToken">GitHub Token</label>
+                        <input type="password" id="githubToken" placeholder="ghp_xxxx">
+                    </div>
+                </div>
+                <div class="btn-container">
+                    <button id="testConnBtn" class="btn-test">测试连接</button>
+                    <button id="saveConfigBtn" class="btn-primary">保存配置</button>
+                </div>
+                <div id="configStatus" class="status-bar" style="display: none;"></div>
+                <div class="info-message">配置一次后自动保存到浏览器本地存储，下次打开自动填充。</div>
+            </div>
         </div>
 
         <!-- 第一步：解析源码 -->
@@ -399,16 +560,9 @@
                 <div class="form-group" style="flex: 1; min-width: 140px;">
                     <label for="proxyMode">解析方式</label>
                     <select id="proxyMode">
-                        <option value="backend">模拟后端（推荐，与Actions一致）</option>
-                        <option value="proxy">代理请求</option>
-                        <option value="custom">自定义代理</option>
-                        <option value="direct">直接请求</option>
+                        <option value="worker">远程抓取（推荐）</option>
                         <option value="manual">手动粘贴</option>
                     </select>
-                </div>
-                <div class="form-group" id="customProxyGroup" style="flex: 2; display: none;">
-                    <label for="customProxy">代理地址</label>
-                    <input type="text" id="customProxy" placeholder="https://api.allorigins.win/raw?url=">
                 </div>
             </div>
             <div class="btn-container">
@@ -577,7 +731,10 @@
                 <button id="generateJsonBtn" class="btn-primary">生成 sources.json</button>
                 <button id="copyJsonBtn" class="btn-success">复制 JSON</button>
                 <button id="downloadJsonBtn" class="btn-secondary">下载 sources.json</button>
+                <button id="saveAndTriggerBtn" class="btn-save-trigger">一键保存并生成 RSS</button>
             </div>
+            <!-- 保存进度 -->
+            <div class="save-progress" id="saveProgress"></div>
             <label>sources.json 预览</label>
             <div class="json-preview" id="jsonPreview">{
   &quot;feeds&quot;: [
@@ -629,6 +786,7 @@
     };
 
     const GH_CONFIG_KEY = 'rss_builder_gh_config';
+    const WORKER_CONFIG_KEY = 'rss_builder_worker_config';
 
     // ============================================================
     // 初始化
@@ -636,19 +794,24 @@
     function init() {
         bindEvents();
         loadGhConfig();
+        loadWorkerConfig();
         updateSourceLength();
         updateRssLinkDisplay();
+        checkWorkerConfig();
     }
 
     // ============================================================
     // 事件绑定
     // ============================================================
     function bindEvents() {
+        // 后端配置
+        document.getElementById('testConnBtn').addEventListener('click', testWorkerConnection);
+        document.getElementById('saveConfigBtn').addEventListener('click', saveWorkerConfig);
+
         // 第一步
         document.getElementById('parseBtn').addEventListener('click', parseSource);
         document.getElementById('clearSourceBtn').addEventListener('click', clearSource);
         document.getElementById('sourceHtml').addEventListener('input', onSourceInput);
-        document.getElementById('proxyMode').addEventListener('change', onProxyModeChange);
 
         // 第二步
         document.getElementById('extractBtn').addEventListener('click', extractContent);
@@ -673,6 +836,7 @@
         document.getElementById('generateJsonBtn').addEventListener('click', generateJsonConfig);
         document.getElementById('copyJsonBtn').addEventListener('click', copyJsonConfig);
         document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonConfig);
+        document.getElementById('saveAndTriggerBtn').addEventListener('click', saveAndTrigger);
     }
 
     // ============================================================
@@ -691,10 +855,6 @@
         btnText.innerHTML = '<span class="loading"></span>解析中...';
         setStatus('parseStatus', '<span class="loading loading-blue"></span>正在获取网页源码...', '');
 
-        let html = '';
-        let success = false;
-        let errorMsg = '';
-
         if (proxyMode === 'manual') {
             alert('请将F12中复制的源码粘贴到下方源码区域');
             btn.disabled = false;
@@ -703,143 +863,42 @@
             return;
         }
 
-        const modes = proxyMode === 'auto' ? ['direct', 'proxy'] : [proxyMode];
-
-        for (const mode of modes) {
-            try {
-                if (mode === 'direct') html = await fetchDirect(url);
-                else if (mode === 'proxy') html = await fetchViaProxy(url);
-                else if (mode === 'backend') html = await fetchLikeBackend(url);
-                else if (mode === 'custom') html = await fetchWithCustomProxy(url);
-                if (html && html.trim().length > 0) { success = true; break; }
-            } catch (err) {
-                errorMsg = err.message;
-                console.warn(`[${mode}] 解析失败:`, err);
+        try {
+            const html = await fetchViaWorker(url);
+            if (html && html.trim().length > 0) {
+                state.currentSource = html;
+                document.getElementById('sourceHtml').value = html;
+                updateSourceLength();
+                setStatus('parseStatus', `解析成功（远程抓取）✓ — 源码 ${html.length.toLocaleString()} 字符`, 'status-success');
+                autoFillFromHtml(html, url);
+            } else {
+                throw new Error('抓取返回内容为空');
             }
+        } catch (err) {
+            setStatus('parseStatus', `解析失败: ${err.message}`, 'status-error');
+            alert(
+                `无法获取网页源码：${err.message}\n\n` +
+                `解决方法：\n` +
+                `1. 检查后端配置是否正确\n` +
+                `2. 切换到「手动粘贴」模式\n` +
+                `3. 打开目标网页，按 F12 → Elements\n` +
+                `4. 右键 <html> 标签 → Copy → Copy outerHTML\n` +
+                `5. 将源码粘贴到下方「源码内容」框中\n\n` +
+                `然后继续第 2 步填写提取规则即可。`
+            );
         }
 
         btn.disabled = false;
         btnText.textContent = '解析源码';
-
-        if (success) {
-            state.currentSource = html;
-            document.getElementById('sourceHtml').value = html;
-            updateSourceLength();
-            const modeLabel = { backend: '模拟后端', proxy: '代理请求', direct: '直接请求', custom: '自定义代理' }[proxyMode] || proxyMode;
-            setStatus('parseStatus', `解析成功（${modeLabel}模式）✓ — 源码 ${html.length.toLocaleString()} 字符`, 'status-success');
-            autoFillFromHtml(html, url);
-        } else {
-            setStatus('parseStatus', `解析失败: ${errorMsg}`, 'status-error');
-            alert(
-                `无法获取网页源码：${errorMsg}\n\n` +
-                `原因：浏览器的安全限制（CORS）禁止网页直接请求第三方网站。\n\n` +
-                `解决方法：\n` +
-                `1. 打开目标网页，按 F12 → Elements\n` +
-                `2. 右键 <html> 标签 → Copy → Copy outerHTML\n` +
-                `3. 将源码粘贴到下方「源码内容」框中\n\n` +
-                `然后继续第 2 步填写提取规则即可。`
-            );
-        }
     }
 
-    async function fetchDirect(url) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                mode: 'cors',
-                credentials: 'omit',
-                signal: controller.signal,
-                headers: { 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' }
-            });
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            return await response.text();
-        } finally {
-            clearTimeout(timeoutId);
-        }
-    }
-
-    async function fetchViaProxy(url) {
-        const proxies = [
-            `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-            `https://corsproxy.io/?${encodeURIComponent(url)}`,
-            `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`,
-        ];
-
-        for (const proxyUrl of proxies) {
-            try {
-                console.log(`尝试代理: ${proxyUrl}`);
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 15000);
-                const response = await fetch(proxyUrl, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                if (!response.ok) throw new Error(`代理HTTP ${response.status}`);
-                const text = await response.text();
-                if (text && text.trim().length > 10) return text;
-                throw new Error('代理返回内容为空');
-            } catch (err) {
-                console.warn(`代理失败: ${err.message}`);
-                continue; // 尝试下一个代理
-            }
-        }
-        throw new Error('所有代理均不可用');
-    }
-
-    function onProxyModeChange() {
-        const mode = document.getElementById('proxyMode').value;
-        document.getElementById('customProxyGroup').style.display = mode === 'custom' ? '' : 'none';
-    }
-
-    // 自定义代理请求 - 用户填入代理地址，灵活测试
-    async function fetchWithCustomProxy(url) {
-        let proxyBase = document.getElementById('customProxy').value.trim();
-        if (!proxyBase) throw new Error('请输入代理地址');
-
-        // 自动补全：如果用户只填了域名，自动拼接
-        if (!proxyBase.includes('url=')) {
-            proxyBase = proxyBase.endsWith('/') ? proxyBase : proxyBase + '/';
-            proxyBase = proxyBase + 'raw?url=';
-        }
-
-        const proxyUrl = proxyBase + encodeURIComponent(url);
-        console.log('自定义代理:', proxyUrl);
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        try {
-            const response = await fetch(proxyUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const text = await response.text();
-            if (!text || text.trim().length < 10) throw new Error('返回内容为空');
-            return text;
-        } catch (err) {
-            clearTimeout(timeoutId);
-            throw new Error(`自定义代理失败: ${err.message}`);
-        }
-    }
-
-    // 模拟后端抓取 - 使用和 generate.js 完全相同的代理
-    // 后端默认用 api.allorigins.win，前端也用这个，确保 HTML 一致
-    async function fetchLikeBackend(url) {
-        const backendProxy = 'https://api.allorigins.win/raw?url=';
-        const proxyUrl = backendProxy + encodeURIComponent(url);
-        console.log('模拟后端抓取:', proxyUrl);
-
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 30000);
-        try {
-            const response = await fetch(proxyUrl, { signal: controller.signal });
-            clearTimeout(timeoutId);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const text = await response.text();
-            if (!text || text.trim().length < 10) throw new Error('返回内容为空');
-            return text;
-        } catch (err) {
-            clearTimeout(timeoutId);
-            throw new Error(`模拟后端抓取失败: ${err.message}（与 GitHub Actions 使用相同代理，如果失败说明代理不可用）`);
-        }
+    // 通过 Worker 远程抓取网页源码
+    async function fetchViaWorker(url) {
+        const workerUrl = getWorkerUrl();
+        const response = await fetch(`${workerUrl}/fetch?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || '抓取失败');
+        return data.html;
     }
 
     function clearSource() {
@@ -1190,6 +1249,157 @@
             if (config.username) document.getElementById('ghUsername').value = config.username;
             if (config.repo) document.getElementById('ghRepo').value = config.repo;
         } catch (e) {}
+    }
+
+    // ============================================================
+    // Worker 配置管理
+    // ============================================================
+    function getWorkerUrl() {
+        const url = document.getElementById('workerUrl').value.trim();
+        if (!url) throw new Error('请先配置 Worker 地址');
+        // 去掉末尾斜杠，保持一致
+        return url.replace(/\/+$/, '');
+    }
+
+    function toggleBackendConfig() {
+        const body = document.getElementById('configBody');
+        const arrow = document.getElementById('configArrow');
+        body.classList.toggle('collapsed');
+        arrow.classList.toggle('collapsed');
+    }
+
+    function checkWorkerConfig() {
+        const workerUrl = document.getElementById('workerUrl').value.trim();
+        const warning = document.getElementById('configWarning');
+        if (workerUrl) {
+            warning.classList.add('hidden');
+        } else {
+            warning.classList.remove('hidden');
+        }
+    }
+
+    async function testWorkerConnection() {
+        const workerUrl = document.getElementById('workerUrl').value.trim();
+        if (!workerUrl) {
+            alert('请先填写 Worker 地址');
+            return;
+        }
+        const statusEl = document.getElementById('configStatus');
+        const btn = document.getElementById('testConnBtn');
+        statusEl.style.display = '';
+        statusEl.innerHTML = '<span class="status-text"><span class="loading loading-blue"></span>正在测试连接...</span>';
+        btn.disabled = true;
+
+        try {
+            const base = workerUrl.replace(/\/+$/, '');
+            const response = await fetch(`${base}/health`, { signal: AbortSignal.timeout(10000) });
+            const data = await response.json();
+            if (data.success || response.ok) {
+                statusEl.innerHTML = '<span class="status-success">连接成功 ✓ — Worker 正常运行</span>';
+            } else {
+                throw new Error(data.error || 'Worker 返回异常');
+            }
+        } catch (err) {
+            statusEl.innerHTML = `<span class="status-error">连接失败：${err.message}</span>`;
+        }
+
+        btn.disabled = false;
+    }
+
+    function saveWorkerConfig() {
+        const workerUrl = document.getElementById('workerUrl').value.trim();
+        const githubToken = document.getElementById('githubToken').value.trim();
+        localStorage.setItem(WORKER_CONFIG_KEY, JSON.stringify({
+            workerUrl,
+            githubToken,
+        }));
+        checkWorkerConfig();
+        alert('配置已保存到浏览器本地存储');
+    }
+
+    function loadWorkerConfig() {
+        try {
+            const config = JSON.parse(localStorage.getItem(WORKER_CONFIG_KEY) || '{}');
+            if (config.workerUrl) document.getElementById('workerUrl').value = config.workerUrl;
+            if (config.githubToken) document.getElementById('githubToken').value = config.githubToken;
+        } catch (e) {}
+    }
+
+    // ============================================================
+    // 一键保存并生成 RSS（通过 Worker）
+    // ============================================================
+    async function saveAndTrigger() {
+        if (!state.currentJsonConfig) {
+            alert('请先生成 sources.json 配置');
+            return;
+        }
+
+        const workerUrl = document.getElementById('workerUrl').value.trim();
+        if (!workerUrl) {
+            alert('请先配置 Worker 地址');
+            toggleBackendConfig();
+            return;
+        }
+
+        const githubToken = document.getElementById('githubToken').value.trim();
+        if (!githubToken) {
+            alert('请先配置 GitHub Token');
+            toggleBackendConfig();
+            return;
+        }
+
+        const btn = document.getElementById('saveAndTriggerBtn');
+        const progress = document.getElementById('saveProgress');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span>处理中...';
+        progress.className = 'save-progress active info';
+        progress.textContent = '正在保存 sources.json 到 GitHub...';
+
+        try {
+            const base = workerUrl.replace(/\/+$/, '');
+
+            // 第一步：调用 /save 接口保存到 GitHub
+            const saveResp = await fetch(`${base}/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    content: JSON.stringify(state.currentJsonConfig, null, 2),
+                    token: githubToken,
+                    repo: document.getElementById('ghRepo').value.trim(),
+                }),
+            });
+            const saveData = await saveResp.json();
+
+            if (!saveData.success) {
+                throw new Error(saveData.error || '保存失败');
+            }
+
+            progress.textContent = 'sources.json 已保存成功，正在触发 GitHub Actions...';
+
+            // 第二步：调用 /trigger 接口触发 Actions
+            const triggerResp = await fetch(`${base}/trigger`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    token: githubToken,
+                    repo: document.getElementById('ghRepo').value.trim(),
+                }),
+            });
+            const triggerData = await triggerResp.json();
+
+            progress.className = 'save-progress active success';
+            if (triggerData.success) {
+                progress.textContent = `完成！sources.json 已保存，GitHub Actions 已触发。稍后即可访问 RSS 链接。`;
+            } else {
+                progress.textContent = `sources.json 已保存成功，但触发 Actions 失败：${triggerData.error || '未知错误'}。请手动前往 GitHub Actions 页面触发。`;
+            }
+        } catch (err) {
+            progress.className = 'save-progress active error';
+            progress.textContent = `操作失败：${err.message}`;
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '一键保存并生成 RSS';
     }
 
     // ============================================================
