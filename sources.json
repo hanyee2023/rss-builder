@@ -22,19 +22,19 @@
     },
     {
       "id": "feed-1",
-      "name": "美之图",
-      "url": "https://kkmzt.com/photo/",
-      "description": "美女图片",
-      "rule": "<a class=\"uk-inline u-thumb-v\" href=\"{%}\"><img width=\"640\" height=\"960\" data-src=\"{*}\" data-srcset=\"{%}\" alt=\"{%}\" uk-img=\"\" src=\"{*}\"></a>",
+      "name": "山狗",
+      "url": "https://media.3go.fun/latest",
+      "description": "自拍视频",
+      "rule": "<div class=\"item-content\"><a href=\"https://media.3go.fun/view?m={*}\" title=\"{%}\" tabindex=\"-1\" aria-hidden=\"true\" class=\"item-thumb\" style=\"background-image: url(&quot;https://media.3go.fun/media/original/thumbnails/user/91%E8%87%AA%E6%8B%8D%E8%A7%86%E9%A2%91/{%}_{%}.{%}.mp4.jpg&quot;);\">",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
         "trimContent": true
       },
       "tpl": {
-        "title": "{%3}",
-        "link": "{%1}",
-        "content": "<img src=\"{%2}\" width=\"100%\">"
+        "title": "{%1}",
+        "link": "https://media.3go.fun/media/original/user/91%E8%87%AA%E6%8B%8D%E8%A7%86%E9%A2%91/{%2}.{%4}.mp4",
+        "content": "<video src=\"https://media.3go.fun/media/original/user/91%E8%87%AA%E6%8B%8D%E8%A7%86%E9%A2%91/{%2}.{%4}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://media.3go.fun/media/original/thumbnails/user/91%E8%87%AA%E6%8B%8D%E8%A7%86%E9%A2%91/{%2}_{%3}.{%4}.mp4.jpg\"></video>"
       },
       "maxItems": 50,
       "updateInterval": "6h",
