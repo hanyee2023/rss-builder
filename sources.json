@@ -319,6 +319,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "xiaolanshipin",
+      "name": "小蓝视频",
+      "url": "https://djj5f452.top:13579/list/69",
+      "description": "小蓝视频",
+      "rule": "<div class=\"thumb\">\n            <img data-src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%}/{%}/320x180/{%}.jpg\" class=\"{*}\"{*}>\n            <span class=\"time\">{*}</span>\n          </div>\n          <p>{%}</p>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%4}",
+        "link": "https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8",
+        "content": "视频链接：https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8\n<br>\n<img src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%1}/{%2}/320x180/{%3}.jpg\" width=\"240\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
