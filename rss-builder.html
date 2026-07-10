@@ -435,6 +435,13 @@
                 <span class="step-number">1</span>
                 粘贴网页源码
             </h2>
+            <div class="form-row">
+                <div class="form-group" style="flex: 3;">
+                    <label for="targetUrl">目标网页地址</label>
+                    <input type="url" id="targetUrl" placeholder="https://example.com/page" required>
+                    <div class="info-message">后端 Puppeteer 会根据此地址抓取最新内容，和 F12 结果一致</div>
+                </div>
+            </div>
             <div class="note">
                 <strong>操作步骤：</strong>
                 <ol>
@@ -868,7 +875,7 @@
         xml += '<channel>\n';
         // title 和 description 使用转义方式，兼容性更好
         xml += `  <title>${escapeXml(rssTitle)}</title>\n`;
-        xml += `  <link>${escapeXml('')}</link>\n`;
+        xml += `  <link>${escapeXml(document.getElementById('targetUrl').value.trim() || '')}</link>\n`;
         xml += `  <description>${escapeXml(rssDescription)}</description>\n`;
         xml += `  <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>\n`;
         xml += `  <generator>RSS Builder v2.0</generator>\n`;
@@ -905,7 +912,7 @@
         state.currentFeedConfig = {
             id: document.getElementById('feedId').value.trim() || 'feed-' + Date.now(),
             name: rssTitle,
-            url: '',
+            url: document.getElementById('targetUrl').value.trim(),
             description: rssDescription,
             rule: document.getElementById('ruleInput').value.trim(),
             options: {
