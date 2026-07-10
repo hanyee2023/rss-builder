@@ -1,32 +1,11 @@
 {
   "feeds": [
-   {
-      "id": "meizhitu",
-      "name": "美之图",
-      "url": "https://kkmzt.com/photo/",
-      "description": "影视平面图",
-      "rule": "<a class=\"uk-inline u-thumb-v\" href=\"{%}\"><img width=\"640\" height=\"960\" data-src=\"{*}\" data-srcset=\"{%}\" alt=\"{%}\" uk-img=\"\" src=\"{*}\"></a>",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%3}",
-        "link": "{%1}",
-        "content": "<img src=\"{%2}\" width=\"100%\">"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "language": "zh-CN",
-      "proxy": true
-    },
     {
-      "id": "tiktok",
-      "name": "Tiktok",
-      "url": "https://919129.xyz",
-      "description": "测试02",
-      "rule": "<meta itemprop=\"author\" content=\"lux8pw\" /><meta itemprop=\"name\" content=\"{%}\" /><meta itemprop=\"description\" content=\"{*}\" /><meta itemprop=\"duration\" content=\"{*}\" /><meta itemprop=\"thumbnailUrl\" content=\"{%}\" /><meta itemprop=\"contentURL\" content=\"{%}\" /><meta itemprop=\"uploadDate\" content=\"{*}\" />",
+      "id": "meirishipin",
+      "name": "Twstalker@每日视频",
+      "url": "https://twstalker.com/kathyreid367511",
+      "description": "视频分享",
+      "rule": "<div class=\"activity-descp\">\n                                                        <p>{%}  </p>\n                                                        \n                                                            <div class=\"card card-raised card-carousel\">\n                                                                <div id=\"{*}\" class=\"carousel slide\" data-ride=\"carousel\" data-interval=\"999000\">\n                                                                                                                                        <div class=\"carousel-inner\">\n                                                                        <div class=\"carousel-item active\"><video rel=\"nofollow\" alt=\"Second slide\" controls=\"\" poster=\"{%}\" class=\"d-block w-100\"><source src=\"{%}\" type=\"video/mp4\"></video></div>                                                                    </div>\n                                                                                                                                    </div>\n                                                            </div>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -39,27 +18,7 @@
       },
       "maxItems": 50,
       "updateInterval": "6h",
-      "language": "zh-CN"
-    },
-    {
-      "id": "xiannvshe",
-      "name": "仙女社",
-      "url": "https://n1p1.com/",
-      "description": "影视平面图",
-      "rule": "<div class=\"img\">\n        <a href=\"{*}\" title=\"{%} [{*}]\" target=\"_blank\" rel=\"bookmark\">\n        <img src=\"{*}\" data-src=\"{%}\" class=\"thumb\" alt=\"{*}\">\n                </a>\n    </div>",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%1}",
-        "link": "{%2}",
-        "content": "<img src=\"{%2}\" width=\"100%\">"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "language": "zh-CN"
+      "proxy": true
     }
   ]
 }
