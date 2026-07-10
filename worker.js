@@ -31,6 +31,9 @@ export default {
             if (path === '/save' && request.method === 'POST') {
                 return handleSave(await request.json());
             }
+            if (path === '/delete' && request.method === 'POST') {
+                return handleDelete(await request.json());
+            }
             if (path === '/trigger' && request.method === 'POST') {
                 return handleTrigger();
             }
@@ -47,6 +50,49 @@ export default {
         }
     }
 };
+
+async function handleDelete(body) {
+    if (!GITHUB_TOKEN || GITHUB_TOKEN === '在这里填入你的GitHub Personal Access Token') {
+        return json({ error: '未配置 GITHUB_TOKEN' }, 500);
+    }
+    if (!body.feedId) {
+        return json({ error: '缺少 feedId' }, 400);
+    }
+
+    // 获取当前 sources.json
+    const res = await fetch(`${GITHUB_API}/contents/sources.json`, { headers: ghHeaders() });
+    if (!res.ok) return json({ error: '无法读取 sources.json' }, res.status);
+    const data = await res.json();
+    let content = atob(data.content);
+    const sources = JSON.parse(content);
+
+    if (!sources.feeds || !Array.isArray(sources.feeds)) {
+        return json({ error: 'sources.json 格式错误' }, 400);
+    }
+
+    // 删除指定订阅源
+    const before = sources.feeds.length;
+    sources.feeds = sources.feeds.filter(f => f.id !== body.feedId);
+    const after = sources.feeds.length;
+
+    if (before === after) {
+        return json({ error: `未找到订阅源「${body.feedId}」` }, 404);
+    }
+
+    // 写回
+    const result = await fetch(`${GITHUB_API}/contents/sources.json`, {
+        method: 'PUT',
+        headers: ghHeaders(),
+        body: JSON.stringify({
+            message: `delete feed ${body.feedId} - ${new Date().toISOString().slice(0,16)}`,
+            content: btoa(unescape(encodeURIComponent(JSON.stringify(sources, null, 2)))),
+            sha: data.sha,
+        }),
+    });
+    const putData = await result.json();
+    if (!result.ok) return json({ error: putData.message || '删除失败', details: putData }, result.status);
+    return json({ success: true, message: `已删除订阅源「${body.feedId}」` });
+}
 
 async function handleSave(body) {
     if (!GITHUB_TOKEN || GITHUB_TOKEN === '在这里填入你的GitHub Personal Access Token') {
