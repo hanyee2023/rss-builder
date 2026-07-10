@@ -124,7 +124,7 @@
       "id": "phe69",
       "name": "PHE69",
       "url": "https://phe69.sbs/phim-sex-moi/",
-      "description": "越南视频",
+      "description": "国外视频",
       "rule": "<div class=\"post-thumbnail-container\"><img class=\"video-main-thumb{*}\" width=\"300\" height=\"168.75\" src=\"https://phe69.sbs/wp-content/uploads/{%}/{%}/{%}.jpg\" alt=\"{%}\" data-was-processed=\"true\"></div>\t\t\t<div class=\"video-overlay\"></div>",
       "options": {
         "stripHtml": true,
@@ -158,7 +158,7 @@
       },
       "maxItems": 50,
       "updateInterval": "6h",
-      "proxy": false
+      "proxy": "puppeteer"
     },
     {
       "id": "theone",
