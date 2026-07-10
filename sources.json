@@ -161,11 +161,11 @@
       "proxy": false
     },
     {
-      "id": "sanding69",
-      "name": "Twitter@三丁 成都",
-      "url": "https://zamantika.com/profile/sanding69",
+      "id": "theone",
+      "name": "Twitter@The one",
+      "url": "https://carryfeed.com/?url=ju266945",
       "description": "视频分享",
-      "rule": "<div class=\"{*} tweet-text\">{%}</div>{*}<video src=\"{%}\" poster=\"{%}\" class=\"{*}\" muted=\"\" playsinline=\"\" preload=\"metadata\"></video>",
+      "rule": "<article class=\"profile-feed-item\"><div class=\"profile-feed-author\">{*}</div><p>{%}</p>{*}<img src=\"https://pbs.twimg.com/{%}_thumb/{%}/img/{%}.jpg\" alt=\"Media preview\">{*}<a class=\"profile-feed-media-download\" href=\"/download?url=https%3A%2F%2Fvideo.twimg.com%2F{*}%2F{*}%2Fvid%2Favc1%2F{%}%2F{*}.mp4%3Ftag%3D{*}&amp;filename={%}.mp4\" aria-label=\"Download media 1\">{*}</a></div></div></article>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -173,8 +173,8 @@
       },
       "tpl": {
         "title": "{%1}",
-        "link": "{%2}",
-        "content": "<video src=\"{%2}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%3}\"></video>"
+        "link": "https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4",
+        "content": "<video src=\"https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://pbs.twimg.com/{%2}_thumb/{%3}/img/{%4}.jpg\"></video>"
       },
       "maxItems": 50,
       "updateInterval": "6h",
