@@ -19,6 +19,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": true
+    },
+    {
+      "id": "tiktok",
+      "name": "91Tiktok",
+      "url": "https://919129.xyz/vids/",
+      "description": "短视频",
+      "rule": "<meta itemprop=\"author\" content=\"lux8pw\"><meta itemprop=\"name\" content=\"{%}\"><meta itemprop=\"description\" content=\"{*}\"><meta itemprop=\"duration\" content=\"{*}\"><meta itemprop=\"thumbnailUrl\" content=\"{%}\"><meta itemprop=\"contentURL\" content=\"{%}\"><meta itemprop=\"uploadDate\" content=\"{*}\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "{%3}",
+        "content": "<video src=\"{%3}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%2}\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": false
     }
   ]
 }
