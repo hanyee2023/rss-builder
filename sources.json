@@ -119,6 +119,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "phe69",
+      "name": "PHE69",
+      "url": "https://phe69.sbs/phim-sex-moi/",
+      "description": "越南视频",
+      "rule": "<div class=\"post-thumbnail-container\"><img class=\"video-main-thumb{*}\" width=\"300\" height=\"168.75\" src=\"https://phe69.sbs/wp-content/uploads/{%}/{%}/{%}.jpg\" alt=\"{%}\" data-was-processed=\"true\"></div>\t\t\t<div class=\"video-overlay\"></div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%4}",
+        "link": "https://phim.phe69.sbs/{%3}.mp4",
+        "content": "<video src=\"https://phim.phe69.sbs/{%3}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://phe69.sbs/wp-content/uploads/{%1}/{%2}/{%3}.jpg\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
