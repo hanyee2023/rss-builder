@@ -101,20 +101,20 @@
       "proxy": "puppeteer"
     },
     {
-      "id": "tiyusheng",
-      "name": "Twitter@污哩體育生",
-      "url": "https://zamantika.com/profile/_swuli",
-      "description": "视频分享",
-      "rule": "<div class=\"{*} tweet-text\">{%}</div>{*}<video src=\"{%}\" poster=\"{%}\" class=\"{*}\" muted=\"\" playsinline=\"\" preload=\"metadata\"></video>",
+      "id": "xiaohuangniao",
+      "name": "小黄鸟",
+      "url": "https://xiaohuangniao.me/tiktok",
+      "description": "短视频",
+      "rule": "<div data-index=\"{*}\" class=\"relative h-full snap-start flex items-center justify-center overflow-hidden\"><div class=\"{*}\" style=\"background-image: url({*});\"></div><div class=\"absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/50 pointer-events-none\"></div><video src=\"{%}\" poster=\"{%}\" class=\"relative z-10 h-full w-full object-cover md:object-contain drop-shadow-2xl pointer-events-none md:pointer-events-auto\" playsinline=\"\" loop=\"\" preload=\"metadata\"></video><div class=\"{*}\">{*}</div><div class=\"relative text-white space-y-2\"><div class=\"flex items-center gap-3\"><img alt=\"{*}\" class=\"w-10 h-10 rounded-full\" src=\"{*}\"><div class=\"min-w-0\"><div class=\"font-semibold\"{*}</div><a class=\"text-sm text-white/70 hover:text-white hover:underline\" href=\"{*}\">{*}</a></div></div><div class=\"{*}\">{%}</div>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
         "trimContent": true
       },
       "tpl": {
-        "title": "{%1}",
-        "link": "{%2}",
-        "content": "<video src=\"{%2}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%3}\"></video>"
+        "title": "{%3}",
+        "link": "{%1}",
+        "content": "<video src=\"{%1}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%2}\"></video>"
       },
       "maxItems": 50,
       "updateInterval": "6h",
