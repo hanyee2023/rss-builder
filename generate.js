@@ -379,11 +379,22 @@ function fetchPage(url, retryCount = 0, proxy = false) {
 
 // ============================================================
 // 通过代理抓取 - 解决 403 等 IP 封禁问题
+// 支持：
+//   - true → 使用默认代理 api.allorigins.win
+//   - "https://xxx.workers.dev/fetch?url=" → 使用 Worker 代理（返回 JSON { html })
+//   - "https://other-proxy/raw?url=" → 使用其他代理（直接返回 HTML）
 // ============================================================
 function fetchWithProxy(url, retryCount = 0, proxyConfig) {
-    const proxyUrl = typeof proxyConfig === 'string' && proxyConfig.length > 0
-        ? proxyConfig
-        : 'https://api.allorigins.win/raw?url=';
+    let proxyUrl;
+    let isWorkerProxy = false;
+
+    if (typeof proxyConfig === 'string' && proxyConfig.length > 0) {
+        proxyUrl = proxyConfig;
+        // 检测是否是 Worker 代理（路径包含 /fetch）
+        isWorkerProxy = proxyConfig.includes('/fetch');
+    } else {
+        proxyUrl = 'https://api.allorigins.win/raw?url=';
+    }
 
     const fullUrl = proxyUrl + encodeURIComponent(url);
 
@@ -427,7 +438,27 @@ function fetchWithProxy(url, retryCount = 0, proxyConfig) {
             stream.on('data', (chunk) => chunks.push(chunk));
             stream.on('end', () => {
                 const buffer = Buffer.concat(chunks);
-                resolve(buffer.toString('utf-8'));
+                let html;
+
+                if (isWorkerProxy) {
+                    // Worker 返回 JSON { success, html, ... }
+                    try {
+                        const data = JSON.parse(buffer.toString('utf-8'));
+                        if (data.success && data.html) {
+                            html = data.html;
+                        } else {
+                            reject(new Error(`Worker 返回错误: ${data.error || '未知错误'}`));
+                            return;
+                        }
+                    } catch (e) {
+                        reject(new Error('Worker 返回的不是有效 JSON'));
+                        return;
+                    }
+                } else {
+                    html = buffer.toString('utf-8');
+                }
+
+                resolve(html);
             });
             stream.on('error', reject);
         });
