@@ -239,6 +239,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": false
+    },
+    {
+      "id": "slideshow",
+      "name": "Slideshow",
+      "url": "https://www.redlite.app/r/MassiveCock?sort=hot",
+      "description": "图潘",
+      "rule": "<a aria-label=\"view full image\" href=\"https://i.redd.it/{%}\" rel=\"noopener noreferrer\" target=\"_blank\"><img alt=\"{%}\" data-hint=\"image\" decoding=\"async\" id=\"{*}\" height=\"{*}\" loading=\"lazy\" {*}></a>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "https://siteproxy-1.j7o.com/default/https/i.redd.it/{%1}",
+        "content": "<img src=\"https://siteproxy-1.j7o.com/default/https/i.redd.it/{%1}\" width=\"250\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
