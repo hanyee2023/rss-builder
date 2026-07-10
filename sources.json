@@ -259,6 +259,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "meirentuku",
+      "name": "媚人图库",
+      "url": "https://meirrrrrrr.xyz/",
+      "description": "机构写真",
+      "rule": "<div><a target=\"_blank\" href=\"{*}\"><img class=\"rounded-lg shadow-sm w-full h-80 lg:h-96 object-cover\" src=\"{%}\" referrerpolicy=\"no-referrer\" onerror=\"{*}\"></a></div>\n  <div class=\"font-semibold\"><a target=\"_blank\" href=\"{*}\"><h2>{%}</h2></a></div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "{%1}",
+        "content": "<img src=\"{%1}\" width=\"250\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
