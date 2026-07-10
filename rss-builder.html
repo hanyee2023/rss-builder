@@ -714,10 +714,10 @@
 
         // 第四步
         document.getElementById('workerUrl').addEventListener('input', saveWorkerUrl);
-        document.getElementById('generateJsonBtn').addEventListener('click', generateJsonConfig);
+        document.getElementById('generateJsonBtn').addEventListener('click', () => generateJsonConfig(true));
         document.getElementById('copyJsonBtn').addEventListener('click', copyJsonConfig);
         document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonConfig);
-        document.getElementById('saveAndTriggerBtn').addEventListener('click', saveAndTrigger);
+        document.getElementById('saveAndTriggerBtn').addEventListener('click', () => saveAndTrigger(true));
     }
 
     function onSourceInput() {
@@ -1005,12 +1005,54 @@
     // ============================================================
     // 第四步：生成 sources.json
     // ============================================================
-    function generateJsonConfig() {
+    // 一键保存时，先从 GitHub 拉取已有的 sources.json，追加新订阅源
+    async function generateJsonConfig(appendMode = false) {
         if (!state.currentFeedConfig) { alert('请先生成 RSS 内容'); return; }
-        const config = { feeds: [state.currentFeedConfig] };
+
+        let existingFeeds = [];
+
+        if (appendMode) {
+            // 从 GitHub 读取现有的 sources.json
+            try {
+                const workerUrl = document.getElementById('workerUrl').value.trim();
+                if (workerUrl) {
+                    const ghFileUrl = `https://raw.githubusercontent.com/${document.getElementById('ghUsername').value.trim()}/${document.getElementById('ghRepo').value.trim()}/main/sources.json`;
+                    const resp = await fetch(ghFileUrl);
+                    if (resp.ok) {
+                        const existing = await resp.json();
+                        if (existing.feeds && Array.isArray(existing.feeds)) {
+                            existingFeeds = existing.feeds;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('读取已有 sources.json 失败，将只包含当前订阅源:', e);
+            }
+        }
+
+        // 检查是否已存在相同 id 的订阅源，如果有则替换
+        const newId = state.currentFeedConfig.id;
+        const existIdx = existingFeeds.findIndex(f => f.id === newId);
+        if (existIdx >= 0) {
+            existingFeeds[existIdx] = state.currentFeedConfig;
+        } else {
+            existingFeeds.push(state.currentFeedConfig);
+        }
+
+        const config = { feeds: existingFeeds };
         document.getElementById('jsonPreview').textContent = JSON.stringify(config, null, 2);
         state.currentJsonConfig = config;
-        alert('sources.json 已生成！');
+
+        if (appendMode) {
+            const total = existingFeeds.length;
+            if (existIdx >= 0) {
+                setStatus('jsonStatus', `已更新订阅源「${newId}」，当前共 ${total} 个`, 'status-success');
+            } else {
+                setStatus('jsonStatus', `已追加订阅源「${newId}」，当前共 ${total} 个`, 'status-success');
+            }
+        } else {
+            alert(`sources.json 已生成（共 ${existingFeeds.length} 个订阅源）！`);
+        }
     }
 
     function copyJsonConfig() {
@@ -1070,15 +1112,22 @@
     // ============================================================
     // 一键保存并生成 RSS（通过 Worker）
     // ============================================================
-    async function saveAndTrigger() {
-        if (!state.currentJsonConfig) {
-            alert('请先生成 sources.json 配置');
+    async function saveAndTrigger(appendMode = true) {
+        if (!state.currentFeedConfig) {
+            alert('请先生成 RSS 内容');
             return;
         }
 
         const workerUrl = document.getElementById('workerUrl').value.trim();
         if (!workerUrl) {
             alert('请先配置 Worker 地址');
+            return;
+        }
+
+        // 先生成完整的 sources.json（含已有的订阅源）
+        await generateJsonConfig(appendMode);
+
+        if (!state.currentJsonConfig) {
             return;
         }
 
