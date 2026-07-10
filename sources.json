@@ -201,9 +201,9 @@
       "proxy": "puppeteer"
     },
     {
-      "id": "guys",
-      "name": "Twitter@Guys  Only",
-      "url": "https://carryfeed.com/?url=veryguys",
+      "id": "huoying",
+      "name": "Twitter@火影夫夫",
+      "url": "https://carryfeed.com/?url=lang_tai96826",
       "description": "视频分享",
       "rule": "<article class=\"profile-feed-item\"><div class=\"profile-feed-author\">{*}</div><p>{%}</p>{*}<img src=\"https://pbs.twimg.com/{%}_thumb/{%}/img/{%}.jpg\" alt=\"Media preview\">{*}<a class=\"profile-feed-media-download\" href=\"/download?url=https%3A%2F%2Fvideo.twimg.com%2F{*}%2F{*}%2Fvid%2Favc1%2F{%}%2F{*}.mp4%3Ftag%3D{*}&amp;filename={%}.mp4\" aria-label=\"Download media 1\">{*}</a></div></div></article>",
       "options": {
