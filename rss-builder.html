@@ -1005,45 +1005,58 @@
     // ============================================================
     // 第四步：生成 sources.json
     // ============================================================
-    // 一键保存时，先从 GitHub 拉取已有的 sources.json，追加新订阅源
+
+    // 缓存已读取的订阅源列表，避免连续添加时需要每次请求 GitHub
+    let cachedExistingFeeds = null;
+
+    // 从 GitHub 读取已有的订阅源列表（带缓存）
+    async function fetchExistingFeeds(forceRefresh = false) {
+        if (!forceRefresh && cachedExistingFeeds) {
+            return cachedExistingFeeds;
+        }
+
+        const ghUsername = document.getElementById('ghUsername').value.trim();
+        const ghRepo = document.getElementById('ghRepo').value.trim();
+        if (!ghUsername || !ghRepo) return [];
+
+        try {
+            // 加时间戳避免 GitHub raw 缓存
+            const ghFileUrl = `https://raw.githubusercontent.com/${ghUsername}/${ghRepo}/main/sources.json?t=${Date.now()}`;
+            const resp = await fetch(ghFileUrl);
+            if (resp.ok) {
+                const existing = await resp.json();
+                if (existing.feeds && Array.isArray(existing.feeds)) {
+                    cachedExistingFeeds = existing.feeds;
+                    return existing.feeds;
+                }
+            }
+        } catch (e) {
+            console.warn('读取已有 sources.json 失败:', e);
+        }
+        return cachedExistingFeeds || [];
+    }
+
+    // 生成 sources.json（预览只显示当前订阅源）
     async function generateJsonConfig(appendMode = false) {
         if (!state.currentFeedConfig) { alert('请先生成 RSS 内容'); return; }
 
-        let existingFeeds = [];
+        // JSON 预览只显示当前这一个订阅源
+        const singleConfig = { feeds: [state.currentFeedConfig] };
+        document.getElementById('jsonPreview').textContent = JSON.stringify(singleConfig, null, 2);
 
         if (appendMode) {
-            // 从 GitHub 读取现有的 sources.json
-            try {
-                const workerUrl = document.getElementById('workerUrl').value.trim();
-                if (workerUrl) {
-                    const ghFileUrl = `https://raw.githubusercontent.com/${document.getElementById('ghUsername').value.trim()}/${document.getElementById('ghRepo').value.trim()}/main/sources.json`;
-                    const resp = await fetch(ghFileUrl);
-                    if (resp.ok) {
-                        const existing = await resp.json();
-                        if (existing.feeds && Array.isArray(existing.feeds)) {
-                            existingFeeds = existing.feeds;
-                        }
-                    }
-                }
-            } catch (e) {
-                console.warn('读取已有 sources.json 失败，将只包含当前订阅源:', e);
+            // 追加模式：读取已有列表并合并（强制刷新缓存）
+            const existingFeeds = await fetchExistingFeeds(true);
+            const newId = state.currentFeedConfig.id;
+            const existIdx = existingFeeds.findIndex(f => f.id === newId);
+            if (existIdx >= 0) {
+                existingFeeds[existIdx] = state.currentFeedConfig;
+            } else {
+                existingFeeds.push(state.currentFeedConfig);
             }
-        }
+            cachedExistingFeeds = existingFeeds;
+            state.currentJsonConfig = { feeds: existingFeeds };
 
-        // 检查是否已存在相同 id 的订阅源，如果有则替换
-        const newId = state.currentFeedConfig.id;
-        const existIdx = existingFeeds.findIndex(f => f.id === newId);
-        if (existIdx >= 0) {
-            existingFeeds[existIdx] = state.currentFeedConfig;
-        } else {
-            existingFeeds.push(state.currentFeedConfig);
-        }
-
-        const config = { feeds: existingFeeds };
-        document.getElementById('jsonPreview').textContent = JSON.stringify(config, null, 2);
-        state.currentJsonConfig = config;
-
-        if (appendMode) {
             const total = existingFeeds.length;
             if (existIdx >= 0) {
                 setStatus('jsonStatus', `已更新订阅源「${newId}」，当前共 ${total} 个`, 'status-success');
@@ -1051,7 +1064,8 @@
                 setStatus('jsonStatus', `已追加订阅源「${newId}」，当前共 ${total} 个`, 'status-success');
             }
         } else {
-            alert(`sources.json 已生成（共 ${existingFeeds.length} 个订阅源）！`);
+            state.currentJsonConfig = singleConfig;
+            alert(`sources.json 已生成（仅当前订阅源）！`);
         }
     }
 
@@ -1170,7 +1184,14 @@
 
             progress.className = 'save-progress active success';
             if (triggerData.success) {
-                progress.textContent = `完成！sources.json 已保存，GitHub Actions 已触发。稍后即可访问 RSS 链接。`;
+                const feedId = state.currentFeedConfig.id;
+                const ghUser = document.getElementById('ghUsername').value.trim();
+                const ghRepo = document.getElementById('ghRepo').value.trim();
+                const rssLink = `https://${ghUser}.github.io/${ghRepo}/feeds/${feedId}.xml`;
+                progress.innerHTML = `✅ 保存成功！GitHub Actions 已触发。<br>` +
+                    `<strong>RSS 链接（1-2 分钟后可用）：</strong><br>` +
+                    `<a href="${rssLink}" target="_blank" style="color:#1677ff;word-break:break-all;">${rssLink}</a><br>` +
+                    `<span style="color:#6c757d;font-size:12px;">可复制此链接添加到 RSS 阅读器</span>`;
             } else {
                 progress.textContent = `sources.json 已保存成功，但触发 Actions 失败：${triggerData.error || '未知错误'}。请手动前往 GitHub Actions 页面触发。`;
             }
