@@ -14,7 +14,7 @@
  * 6. 记下地址：https://rss-proxy.你的子域.workers.dev
  */
 
-const GITHUB_TOKEN = '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';
+const GITHUB_TOKEN = '在这里填入你的GitHub Personal Access Token';
 const GITHUB_REPO = 'hanyee2023/rss-builder';
 const GITHUB_API = `https://api.github.com/repos/${GITHUB_REPO}`;
 
