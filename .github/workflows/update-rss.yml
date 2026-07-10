@@ -33,6 +33,9 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Install dependencies
+        run: npm install puppeteer
+
       - name: Generate RSS feeds
         run: node generate.js
 
