@@ -42,9 +42,9 @@
     },
     {
       "id": "孔雀海",
-      "name": "RSS Feed",
+      "name": "孔雀海",
       "url": "https://www.kq001.cc/cos",
-      "description": "RSS Feed",
+      "description": "网红COS",
       "rule": "<div class=\"item-body flex xx flex1 jsb\"><h2 class=\"item-heading\"><a href=\"https://www.kq001.cc/{%}\">{%} – {*}</a></h2><a class=\"thumb-items\" href=\"https://www.kq001.cc/{*}\"><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span><span><div class=\"{*}\"><badge class=\"{*}\"><i class=\"{*}\" aria-hidden=\"true\"></i>{*}</badge></div><img src=\"{*}\" data-src=\"/wp-content/uploads/{%}-480x{*}.jpg\" class=\"{*}\" alt=\"{*}\"></span></a><div>",
       "options": {
         "stripHtml": true,
