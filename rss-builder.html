@@ -344,10 +344,7 @@
             vertical-align: middle;
             margin-right: 5px;
         }
-        .loading-blue {
-            border-color: #1677ff;
-            border-top-color: transparent;
-        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
@@ -376,103 +373,24 @@
         }
         .note li { margin-bottom: 3px; }
 
-        /* 后端配置警告横幅 */
-        .config-warning {
-            background: #fff7e6;
-            border: 1px solid #ffc53d;
-            border-radius: 8px;
-            padding: 10px 16px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            color: #ad6800;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .config-warning:hover {
-            background: #fff1d6;
-            border-color: #ffab00;
-        }
-        .config-warning.hidden {
-            display: none;
-        }
-        .config-warning-icon {
-            font-size: 16px;
-            flex-shrink: 0;
-        }
-        .config-warning-text {
-            flex: 1;
-        }
-
-        /* 可折叠后端配置面板 */
-        .backend-config {
+        /* Worker 地址配置 */
+        .worker-url-config {
             background: #f0f5ff;
             border: 1px solid #adc6ff;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
         }
-        .backend-config-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 18px;
-            cursor: pointer;
-            background: #e6f0ff;
-            border-bottom: 1px solid #adc6ff;
-            user-select: none;
-        }
-        .backend-config-header:hover {
-            background: #d6e8ff;
-        }
-        .backend-config-title {
-            font-weight: 600;
-            font-size: 14px;
-            color: #1a56db;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .backend-config-arrow {
+        .worker-url-config label {
             font-size: 12px;
-            color: #1a56db;
-            transition: transform 0.2s;
+            margin-bottom: 4px;
         }
-        .backend-config-arrow.collapsed {
-            transform: rotate(-90deg);
+        .worker-url-config input {
+            font-size: 12px;
         }
-        .backend-config-body {
-            padding: 16px 18px;
-            transition: max-height 0.3s ease;
-        }
-        .backend-config-body.collapsed {
-            display: none;
-        }
-        .backend-config-body .form-row {
-            margin-bottom: 10px;
-        }
-        .backend-config-body .info-message {
-            margin-top: 8px;
-        }
-        .btn-test {
-            background: #722ed1;
-            color: white;
-        }
-        .btn-test:hover {
-            background: #9254de;
-        }
-
-        /* 一键保存按钮 */
-        .btn-save-trigger {
-            background: linear-gradient(135deg, #52c41a, #389e0d);
-            color: white;
-            font-size: 14px;
-            padding: 10px 20px;
-        }
-        .btn-save-trigger:hover {
-            background: linear-gradient(135deg, #73d13d, #52c41a);
+        .worker-url-config .info-message {
+            margin-top: 4px;
+            margin-bottom: 0;
         }
 
         /* 保存进度区域 */
@@ -511,72 +429,28 @@
             <p>四步生成可自动更新的 RSS 订阅源 &middot; 基于 GitHub Actions</p>
         </div>
 
-        <!-- 配置提示横幅 -->
-        <div class="config-warning" id="configWarning" onclick="toggleBackendConfig()">
-            <span class="config-warning-icon">⚠️</span>
-            <span class="config-warning-text">请先配置后端地址（点击展开配置面板）</span>
-        </div>
-
-        <!-- 后端配置（可折叠） -->
-        <div class="backend-config" id="backendConfig">
-            <div class="backend-config-header" onclick="toggleBackendConfig()">
-                <div class="backend-config-title">
-                    <span>🔧</span> 后端配置（Cloudflare Worker）
-                </div>
-                <span class="backend-config-arrow" id="configArrow">▼</span>
-            </div>
-            <div class="backend-config-body" id="configBody">
-                <div class="form-row">
-                    <div class="form-group" style="flex: 2;">
-                        <label for="workerUrl">Worker 地址</label>
-                        <input type="text" id="workerUrl" placeholder="https://rss-builder-proxy.你的子域.workers.dev">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label for="githubToken">GitHub Token</label>
-                        <input type="password" id="githubToken" placeholder="ghp_xxxx">
-                    </div>
-                </div>
-                <div class="btn-container">
-                    <button id="testConnBtn" class="btn-test">测试连接</button>
-                    <button id="saveConfigBtn" class="btn-primary">保存配置</button>
-                </div>
-                <div id="configStatus" class="status-bar" style="display: none;"></div>
-                <div class="info-message">配置一次后自动保存到浏览器本地存储，下次打开自动填充。</div>
-            </div>
-        </div>
-
-        <!-- 第一步：解析源码 -->
+        <!-- 第一步：粘贴网页源码 -->
         <div class="step-section">
             <h2 class="step-title">
                 <span class="step-number">1</span>
-                输入网址并解析源码
+                粘贴网页源码
             </h2>
-            <div class="form-row">
-                <div class="form-group" style="flex: 3;">
-                    <label for="targetUrl">目标网站地址</label>
-                    <input type="url" id="targetUrl" placeholder="https://example.com/page" required>
-                    <div class="info-message">输入需要生成RSS的网页URL</div>
-                </div>
-                <div class="form-group" style="flex: 1; min-width: 140px;">
-                    <label for="proxyMode">解析方式</label>
-                    <select id="proxyMode">
-                        <option value="worker">远程抓取（推荐）</option>
-                        <option value="manual">手动粘贴</option>
-                    </select>
-                </div>
+            <div class="note">
+                <strong>操作步骤：</strong>
+                <ol>
+                    <li>在浏览器中打开目标网页</li>
+                    <li>按 F12 打开开发者工具</li>
+                    <li>切换到 Elements 标签</li>
+                    <li>右键点击 <code>&lt;html&gt;</code> 标签 → Copy → Copy outerHTML</li>
+                    <li>粘贴到下方文本框</li>
+                </ol>
             </div>
-            <div class="btn-container">
-                <button id="parseBtn" class="btn-primary">
-                    <span id="parseBtnText">解析源码</span>
-                </button>
-                <button id="clearSourceBtn" class="btn-secondary">清空</button>
-            </div>
-            <label>源码内容</label>
+            <label>网页源码</label>
             <div class="status-bar">
                 <div class="status-text">源码长度: <span id="sourceLength">0</span> 字符</div>
                 <div id="parseStatus"></div>
             </div>
-            <textarea class="source-code-area" id="sourceHtml" placeholder="等待解析或手动粘贴HTML源码..."></textarea>
+            <textarea class="source-code-area" id="sourceHtml" placeholder="在此粘贴网页源码（outerHTML）..."></textarea>
         </div>
 
         <!-- 第二步：提取规则 -->
@@ -677,7 +551,7 @@
             <div class="checkbox-group" style="margin-top: 4px;">
                 <label class="checkbox-item">
                     <input type="checkbox" id="useProxy">
-                    <span>使用代理（网站返回 403 时启用）</span>
+                    <span>使用 Puppeteer 渲染（JS 动态网页必选）</span>
                 </label>
             </div>
 
@@ -727,11 +601,17 @@
             <div class="format-note">
                 <strong>说明：</strong> 将生成的 JSON 内容复制到 GitHub 仓库的 <code>sources.json</code> 文件中，提交后 GitHub Actions 会自动生成 RSS。
             </div>
+            <!-- Worker 地址配置 -->
+            <div class="worker-url-config">
+                <label for="workerUrl">Worker 地址（用于一键保存到 GitHub）</label>
+                <input type="text" id="workerUrl" placeholder="https://rss-builder-proxy.你的子域.workers.dev">
+                <div class="info-message">配置后自动保存到浏览器本地存储，下次打开自动填充。</div>
+            </div>
             <div class="btn-container">
                 <button id="generateJsonBtn" class="btn-primary">生成 sources.json</button>
                 <button id="copyJsonBtn" class="btn-success">复制 JSON</button>
                 <button id="downloadJsonBtn" class="btn-secondary">下载 sources.json</button>
-                <button id="saveAndTriggerBtn" class="btn-save-trigger">一键保存并生成 RSS</button>
+                <button id="saveAndTriggerBtn" class="btn-success">一键保存并生成 RSS</button>
             </div>
             <!-- 保存进度 -->
             <div class="save-progress" id="saveProgress"></div>
@@ -786,7 +666,7 @@
     };
 
     const GH_CONFIG_KEY = 'rss_builder_gh_config';
-    const WORKER_CONFIG_KEY = 'rss_builder_worker_config';
+    const WORKER_URL_KEY = 'rss_builder_worker_url';
 
     // ============================================================
     // 初始化
@@ -794,23 +674,16 @@
     function init() {
         bindEvents();
         loadGhConfig();
-        loadWorkerConfig();
+        loadWorkerUrl();
         updateSourceLength();
         updateRssLinkDisplay();
-        checkWorkerConfig();
     }
 
     // ============================================================
     // 事件绑定
     // ============================================================
     function bindEvents() {
-        // 后端配置
-        document.getElementById('testConnBtn').addEventListener('click', testWorkerConnection);
-        document.getElementById('saveConfigBtn').addEventListener('click', saveWorkerConfig);
-
         // 第一步
-        document.getElementById('parseBtn').addEventListener('click', parseSource);
-        document.getElementById('clearSourceBtn').addEventListener('click', clearSource);
         document.getElementById('sourceHtml').addEventListener('input', onSourceInput);
 
         // 第二步
@@ -833,86 +706,18 @@
         });
 
         // 第四步
+        document.getElementById('workerUrl').addEventListener('input', saveWorkerUrl);
         document.getElementById('generateJsonBtn').addEventListener('click', generateJsonConfig);
         document.getElementById('copyJsonBtn').addEventListener('click', copyJsonConfig);
         document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonConfig);
         document.getElementById('saveAndTriggerBtn').addEventListener('click', saveAndTrigger);
     }
 
-    // ============================================================
-    // 第一步：解析源码
-    // ============================================================
-    async function parseSource() {
-        const url = document.getElementById('targetUrl').value.trim();
-        if (!url) { alert('请输入目标网站地址'); return; }
-        try { new URL(url); } catch (e) { alert('请输入有效的URL地址'); return; }
-
-        const proxyMode = document.getElementById('proxyMode').value;
-        const btn = document.getElementById('parseBtn');
-        const btnText = document.getElementById('parseBtnText');
-
-        btn.disabled = true;
-        btnText.innerHTML = '<span class="loading"></span>解析中...';
-        setStatus('parseStatus', '<span class="loading loading-blue"></span>正在获取网页源码...', '');
-
-        if (proxyMode === 'manual') {
-            alert('请将F12中复制的源码粘贴到下方源码区域');
-            btn.disabled = false;
-            btnText.textContent = '解析源码';
-            setStatus('parseStatus', '请手动粘贴源码', 'status-text');
-            return;
-        }
-
-        try {
-            const html = await fetchViaWorker(url);
-            if (html && html.trim().length > 0) {
-                state.currentSource = html;
-                document.getElementById('sourceHtml').value = html;
-                updateSourceLength();
-                setStatus('parseStatus', `解析成功（远程抓取）✓ — 源码 ${html.length.toLocaleString()} 字符`, 'status-success');
-                autoFillFromHtml(html, url);
-            } else {
-                throw new Error('抓取返回内容为空');
-            }
-        } catch (err) {
-            setStatus('parseStatus', `解析失败: ${err.message}`, 'status-error');
-            alert(
-                `无法获取网页源码：${err.message}\n\n` +
-                `解决方法：\n` +
-                `1. 检查后端配置是否正确\n` +
-                `2. 切换到「手动粘贴」模式\n` +
-                `3. 打开目标网页，按 F12 → Elements\n` +
-                `4. 右键 <html> 标签 → Copy → Copy outerHTML\n` +
-                `5. 将源码粘贴到下方「源码内容」框中\n\n` +
-                `然后继续第 2 步填写提取规则即可。`
-            );
-        }
-
-        btn.disabled = false;
-        btnText.textContent = '解析源码';
-    }
-
-    // 通过 Worker 远程抓取网页源码
-    async function fetchViaWorker(url) {
-        const workerUrl = getWorkerUrl();
-        const response = await fetch(`${workerUrl}/fetch?url=${encodeURIComponent(url)}`);
-        const data = await response.json();
-        if (!data.success) throw new Error(data.error || '抓取失败');
-        return data.html;
-    }
-
-    function clearSource() {
-        document.getElementById('sourceHtml').value = '';
-        state.currentSource = '';
-        updateSourceLength();
-        setStatus('parseStatus', '', '');
-    }
-
     function onSourceInput() {
         updateSourceLength();
         const text = document.getElementById('sourceHtml').value.trim();
         if (text.length > 0) {
-            setStatus('parseStatus', '已手动粘贴源码 ✓', 'status-success');
+            setStatus('parseStatus', '已粘贴源码 ✓', 'status-success');
         } else {
             setStatus('parseStatus', '', '');
         }
@@ -924,22 +729,6 @@
         document.getElementById('sourceLength').textContent = text.length.toLocaleString();
     }
 
-    function autoFillFromHtml(html, url) {
-        const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-        if (titleMatch && !document.getElementById('rssTitle').value) {
-            const title = titleMatch[1]
-                .replace(/<[^>]*>/g, '')
-                .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
-                .trim();
-            if (title) document.getElementById('rssTitle').value = title;
-        }
-        const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)
-            || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+name=["']description["']/i);
-        if (descMatch && !document.getElementById('rssDescription').value) {
-            document.getElementById('rssDescription').value = descMatch[1].trim();
-        }
-    }
-
     // ============================================================
     // 第二步：提取内容 - 核心规则引擎
     // 【重要】此函数逻辑必须与后端 generate.js 中的 extractWithRule 完全一致
@@ -948,7 +737,7 @@
         const html = state.currentSource;
         const ruleText = document.getElementById('ruleInput').value.trim();
 
-        if (!html) { alert('请先解析或粘贴网页源码'); return; }
+        if (!html) { alert('请先粘贴网页源码'); return; }
         if (!ruleText) { alert('请填写提取规则'); return; }
 
         const options = {
@@ -957,7 +746,7 @@
             trimContent: document.getElementById('trimContent').checked,
         };
 
-        setStatus('extractStatus', '<span class="loading loading-blue"></span>正在提取内容...', '');
+        setStatus('extractStatus', '<span class="loading"></span>正在提取内容...', '');
 
         try {
             const result = extractWithRule(html, ruleText, options);
@@ -1065,7 +854,6 @@
     function generateRss() {
         if (state.extractedData.length === 0) { alert('请先提取内容'); return; }
 
-        const targetUrl = document.getElementById('targetUrl').value.trim() || '';
         const rssTitle = document.getElementById('rssTitle').value.trim() || 'RSS Feed';
         const rssDescription = document.getElementById('rssDescription').value.trim() || rssTitle;
         const tplTitle = document.getElementById('tplTitle').value.trim() || '{%1}';
@@ -1080,7 +868,7 @@
         xml += '<channel>\n';
         // title 和 description 使用转义方式，兼容性更好
         xml += `  <title>${escapeXml(rssTitle)}</title>\n`;
-        xml += `  <link>${escapeXml(targetUrl)}</link>\n`;
+        xml += `  <link>${escapeXml('')}</link>\n`;
         xml += `  <description>${escapeXml(rssDescription)}</description>\n`;
         xml += `  <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>\n`;
         xml += `  <generator>RSS Builder v2.0</generator>\n`;
@@ -1092,8 +880,8 @@
             let link = applyTemplate(tplLink, row);
             let description = applyTemplate(tplContent, row);
 
-            if (link && targetUrl) {
-                try { link = new URL(link, targetUrl).href; } catch (e) {}
+            if (link) {
+                try { link = new URL(link).href; } catch (e) {}
             }
 
             const guid = generateGuid(title + link + i);
@@ -1117,7 +905,7 @@
         state.currentFeedConfig = {
             id: document.getElementById('feedId').value.trim() || 'feed-' + Date.now(),
             name: rssTitle,
-            url: targetUrl,
+            url: '',
             description: rssDescription,
             rule: document.getElementById('ruleInput').value.trim(),
             options: {
@@ -1252,76 +1040,23 @@
     }
 
     // ============================================================
-    // Worker 配置管理
+    // Worker URL 配置管理（简化版，仅保存地址）
     // ============================================================
     function getWorkerUrl() {
         const url = document.getElementById('workerUrl').value.trim();
         if (!url) throw new Error('请先配置 Worker 地址');
-        // 去掉末尾斜杠，保持一致
         return url.replace(/\/+$/, '');
     }
 
-    function toggleBackendConfig() {
-        const body = document.getElementById('configBody');
-        const arrow = document.getElementById('configArrow');
-        body.classList.toggle('collapsed');
-        arrow.classList.toggle('collapsed');
+    function saveWorkerUrl() {
+        const workerUrl = document.getElementById('workerUrl').value.trim();
+        localStorage.setItem(WORKER_URL_KEY, workerUrl);
     }
 
-    function checkWorkerConfig() {
-        const workerUrl = document.getElementById('workerUrl').value.trim();
-        const warning = document.getElementById('configWarning');
-        if (workerUrl) {
-            warning.classList.add('hidden');
-        } else {
-            warning.classList.remove('hidden');
-        }
-    }
-
-    async function testWorkerConnection() {
-        const workerUrl = document.getElementById('workerUrl').value.trim();
-        if (!workerUrl) {
-            alert('请先填写 Worker 地址');
-            return;
-        }
-        const statusEl = document.getElementById('configStatus');
-        const btn = document.getElementById('testConnBtn');
-        statusEl.style.display = '';
-        statusEl.innerHTML = '<span class="status-text"><span class="loading loading-blue"></span>正在测试连接...</span>';
-        btn.disabled = true;
-
+    function loadWorkerUrl() {
         try {
-            const base = workerUrl.replace(/\/+$/, '');
-            const response = await fetch(`${base}/health`, { signal: AbortSignal.timeout(10000) });
-            const data = await response.json();
-            if (data.success || response.ok) {
-                statusEl.innerHTML = '<span class="status-success">连接成功 ✓ — Worker 正常运行</span>';
-            } else {
-                throw new Error(data.error || 'Worker 返回异常');
-            }
-        } catch (err) {
-            statusEl.innerHTML = `<span class="status-error">连接失败：${err.message}</span>`;
-        }
-
-        btn.disabled = false;
-    }
-
-    function saveWorkerConfig() {
-        const workerUrl = document.getElementById('workerUrl').value.trim();
-        const githubToken = document.getElementById('githubToken').value.trim();
-        localStorage.setItem(WORKER_CONFIG_KEY, JSON.stringify({
-            workerUrl,
-            githubToken,
-        }));
-        checkWorkerConfig();
-        alert('配置已保存到浏览器本地存储');
-    }
-
-    function loadWorkerConfig() {
-        try {
-            const config = JSON.parse(localStorage.getItem(WORKER_CONFIG_KEY) || '{}');
-            if (config.workerUrl) document.getElementById('workerUrl').value = config.workerUrl;
-            if (config.githubToken) document.getElementById('githubToken').value = config.githubToken;
+            const url = localStorage.getItem(WORKER_URL_KEY) || '';
+            if (url) document.getElementById('workerUrl').value = url;
         } catch (e) {}
     }
 
@@ -1337,14 +1072,6 @@
         const workerUrl = document.getElementById('workerUrl').value.trim();
         if (!workerUrl) {
             alert('请先配置 Worker 地址');
-            toggleBackendConfig();
-            return;
-        }
-
-        const githubToken = document.getElementById('githubToken').value.trim();
-        if (!githubToken) {
-            alert('请先配置 GitHub Token');
-            toggleBackendConfig();
             return;
         }
 
@@ -1364,7 +1091,6 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     content: JSON.stringify(state.currentJsonConfig, null, 2),
-                    token: githubToken,
                     repo: document.getElementById('ghRepo').value.trim(),
                 }),
             });
@@ -1381,7 +1107,6 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    token: githubToken,
                     repo: document.getElementById('ghRepo').value.trim(),
                 }),
             });
