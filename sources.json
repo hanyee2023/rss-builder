@@ -81,11 +81,11 @@
       "proxy": "puppeteer"
     },
     {
-      "id": "swuli",
-      "name": "Twstalker@污哩體育生",
-      "url": "https://twstalker.com/_swuli",
+      "id": "chuchouquan",
+      "name": "Twitter@除臭犬",
+      "url": "https://carryfeed.com/?url=chuchouquan",
       "description": "视频分享",
-      "rule": "<div class=\"activity-descp\">\n                                                        <p>{%} {*} </p>\n                                                        \n                                                            <div class=\"card card-raised card-carousel\">\n                                                                <div id=\"{*}\" class=\"carousel slide\" data-ride=\"carousel\" data-interval=\"{*}\">\n                                                                                                                                        <div class=\"carousel-inner\">\n                                                                        <div class=\"carousel-item active\"><video rel=\"nofollow\" alt=\"Second slide\" controls=\"\" poster=\"https://pbs.twimg.com/{%}\" class=\"d-block w-100\"><source src=\"https://pbs.twimg.com/{%}?tag={*}\" type=\"video/mp4\"></video></div>                                                                    </div>\n                                                                                                                                    </div>\n                                                            </div>",
+      "rule": "<article class=\"profile-feed-item\"><div class=\"profile-feed-author\">{*}</div><p>{%}</p>{*}<img src=\"https://pbs.twimg.com/{%}_thumb/{%}/img/{%}.jpg\" alt=\"Media preview\">{*}<a class=\"profile-feed-media-download\" href=\"/download?url=https%3A%2F%2Fvideo.twimg.com%2F{*}%2F{*}%2Fvid%2Favc1%2F{%}%2F{*}.mp4%3Ftag%3D{*}&amp;filename={%}.mp4\" aria-label=\"Download media 1\">{*}</a></div></div></article>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -93,11 +93,11 @@
       },
       "tpl": {
         "title": "{%1}",
-        "link": "https://video.twimg.com/{%3}",
-        "content": "<video src=\"https://video.twimg.com/{%3}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://video.twimg.com/{%2}\"></video>"
+        "link": "https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4",
+        "content": "<video src=\"https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://pbs.twimg.com/{%2}_thumb/{%3}/img/{%4}.jpg\"></video>"
       },
       "maxItems": 50,
-      "updateInterval": "daily",
+      "updateInterval": "6h",
       "proxy": "puppeteer"
     }
   ]
