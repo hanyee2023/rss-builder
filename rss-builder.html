@@ -420,107 +420,6 @@
             border: 1px solid #ffccc7;
             color: #a8071a;
         }
-
-        /* 订阅源管理列表 */
-        .feed-list {
-            margin-top: 10px;
-        }
-        .feed-list-empty {
-            text-align: center;
-            padding: 20px;
-            color: #6c757d;
-            font-size: 13px;
-            background: #fafbfc;
-            border-radius: 6px;
-            border: 1px dashed #d9d9d9;
-        }
-        .feed-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 14px;
-            border: 1px solid #e4e7ed;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            background: white;
-            font-size: 13px;
-        }
-        .feed-item:hover {
-            border-color: #1677ff;
-            background: #f0f5ff;
-        }
-        .feed-item-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .feed-item-name {
-            font-weight: 600;
-            color: #1a1a2e;
-            font-size: 13px;
-        }
-        .feed-item-url {
-            color: #6c757d;
-            font-size: 11.5px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .feed-item-tag {
-            display: inline-block;
-            padding: 1px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        .tag-puppeteer {
-            background: #fff7e6;
-            color: #d46b08;
-            border: 1px solid #ffe58f;
-        }
-        .tag-direct {
-            background: #e6f7ff;
-            color: #0050b3;
-            border: 1px solid #91d5ff;
-        }
-        .feed-item-actions {
-            display: flex;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-        .feed-item-actions button {
-            padding: 4px 10px;
-            font-size: 12px;
-            border-radius: 4px;
-        }
-        .btn-delete {
-            background: #fff1f0;
-            color: #cf1322;
-            border: 1px solid #ffa39e;
-        }
-        .btn-delete:hover {
-            background: #ffccc7;
-        }
-        .btn-edit {
-            background: #e6f7ff;
-            color: #0050b3;
-            border: 1px solid #91d5ff;
-        }
-        .btn-edit:hover {
-            background: #bae7ff;
-        }
-        .puppeteer-help {
-            margin-top: 14px;
-            padding: 10px 14px;
-            background: #fffbe6;
-            border: 1px solid #ffe58f;
-            border-radius: 6px;
-            font-size: 12.5px;
-            color: #595959;
-            line-height: 1.6;
-        }
-        .puppeteer-help strong {
-            color: #d46b08;
-        }
     </style>
 </head>
 <body>
@@ -757,25 +656,6 @@
                 </ol>
             </div>
         </div>
-
-        <!-- 第五步：已添加的订阅源管理 -->
-        <div class="step-section">
-            <h2 class="step-title">
-                <span class="step-number">5</span>
-                已添加的订阅源
-            </h2>
-            <div class="btn-container">
-                <button id="refreshListBtn" class="btn-secondary">刷新列表</button>
-            </div>
-            <div id="feedList" class="feed-list">
-                <div class="feed-list-empty">点击「一键保存并生成 RSS」后，订阅源会出现在这里</div>
-            </div>
-            <div class="puppeteer-help">
-                <strong>如何判断是否需要 Puppeteer？</strong><br>
-                如果网站内容需要 JS 渲染（如懒加载图片、SPA 单页应用、瀑布流等），粘贴 F12 源码能提取到内容但后端抓取不到时，勾选 Puppeteer。<br>
-                简单判断：F12 源码很长（>50KB）且包含目标内容 → 一般是 JS 渲染，建议勾选。
-            </div>
-        </div>
     </div>
 
     <script>
@@ -834,7 +714,6 @@
 
         // 第四步
         document.getElementById('workerUrl').addEventListener('input', saveWorkerUrl);
-        document.getElementById('refreshListBtn').addEventListener('click', () => renderFeedList());
         document.getElementById('generateJsonBtn').addEventListener('click', () => generateJsonConfig(true));
         document.getElementById('copyJsonBtn').addEventListener('click', copyJsonConfig);
         document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonConfig);
@@ -1323,116 +1202,11 @@
 
         btn.disabled = false;
         btn.innerHTML = '一键保存并生成 RSS';
-
-        // 保存成功后刷新管理列表
-        if (progress.className.includes('success')) {
-            cachedExistingFeeds = null; // 清除缓存
-            renderFeedList();
-        }
-    }
-
-    // ============================================================
-    // 订阅源管理列表
-    // ============================================================
-    function renderFeedList() {
-        const container = document.getElementById('feedList');
-        const feeds = cachedExistingFeeds;
-        if (!feeds || feeds.length === 0) {
-            container.innerHTML = '<div class="feed-list-empty">暂无已添加的订阅源</div>';
-            return;
-        }
-
-        const ghUser = document.getElementById('ghUsername').value.trim();
-        const ghRepo = document.getElementById('ghRepo').value.trim();
-
-        container.innerHTML = feeds.map(feed => {
-            const proxyTag = feed.proxy === 'puppeteer'
-                ? '<span class="feed-item-tag tag-puppeteer">Puppeteer</span>'
-                : '<span class="feed-item-tag tag-direct">直接抓取</span>';
-            const rssLink = `https://${ghUser}.github.io/${ghRepo}/feeds/${feed.id}.xml`;
-            return `
-                <div class="feed-item">
-                    <div class="feed-item-info">
-                        <div class="feed-item-name">${escapeHtml(feed.name || feed.id)} ${proxyTag}</div>
-                        <div class="feed-item-url">${escapeHtml(feed.url)}</div>
-                        <div class="feed-item-url" style="color:#1677ff;">RSS: <a href="${rssLink}" target="_blank">${feed.id}.xml</a></div>
-                    </div>
-                    <div class="feed-item-actions">
-                        <button class="btn-edit" onclick="loadFeedForEdit('${feed.id}')">编辑</button>
-                        <button class="btn-delete" onclick="deleteFeed('${feed.id}')">删除</button>
-                    </div>
-                </div>`;
-        }).join('');
-    }
-
-    async function loadFeedForEdit(feedId) {
-        const feeds = cachedExistingFeeds;
-        if (!feeds) return;
-        const feed = feeds.find(f => f.id === feedId);
-        if (!feed) { alert('未找到该订阅源'); return; }
-
-        // 回填到表单
-        document.getElementById('targetUrl').value = feed.url || '';
-        document.getElementById('rssTitle').value = feed.name || '';
-        document.getElementById('rssDescription').value = feed.description || '';
-        document.getElementById('ruleInput').value = feed.rule || '';
-        document.getElementById('tplTitle').value = (feed.tpl && feed.tpl.title) || '{%1}';
-        document.getElementById('tplLink').value = (feed.tpl && feed.tpl.link) || '{%2}';
-        document.getElementById('tplContent').value = (feed.tpl && feed.tpl.content) || '{%3}';
-        document.getElementById('feedId').value = feed.id || '';
-        document.getElementById('maxItems').value = feed.maxItems || 50;
-        document.getElementById('updateInterval').value = feed.updateInterval || 'daily';
-        document.getElementById('useProxy').checked = feed.proxy === 'puppeteer';
-
-        if (feed.options) {
-            document.getElementById('stripHtml').checked = feed.options.stripHtml !== false;
-            document.getElementById('decodeEntities').checked = feed.options.decodeEntities !== false;
-            document.getElementById('trimContent').checked = feed.options.trimContent !== false;
-        }
-
-        // 滚动到页面顶部
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setStatus('parseStatus', `已加载订阅源「${feedId}」，修改后请重新一键保存`, 'status-text');
-    }
-
-    async function deleteFeed(feedId) {
-        if (!confirm(`确定要删除订阅源「${feedId}」吗？\n\n删除后 GitHub Actions 会重新生成，该 RSS 链接将失效。`)) {
-            return;
-        }
-
-        const workerUrl = document.getElementById('workerUrl').value.trim();
-        if (!workerUrl) { alert('请先配置 Worker 地址'); return; }
-
-        try {
-            const resp = await fetch(`${workerUrl.replace(/\/+$/, '')}/delete`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ feedId }),
-            });
-            const data = await resp.json();
-
-            if (data.success) {
-                cachedExistingFeeds = null; // 清除缓存
-                renderFeedList();
-                alert(`已删除订阅源「${feedId}」，正在重新生成 RSS...`);
-                // 触发 Actions 重新生成
-                fetch(`${workerUrl.replace(/\/+$/, '')}/trigger`, { method: 'POST' });
-            } else {
-                alert(`删除失败：${data.error}`);
-            }
-        } catch (e) {
-            alert(`删除失败：${e.message}`);
-        }
     }
 
     // ============================================================
     // 工具函数
     // ============================================================
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str || '';
-        return div.innerHTML;
-    }
     function setStatus(elementId, html, className) {
         const el = document.getElementById(elementId);
         if (!el) return;
