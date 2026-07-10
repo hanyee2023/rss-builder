@@ -299,6 +299,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "follow",
+      "name": "XXXfollow",
+      "url": "https://www.xxxfollow.com/men/newest-creators",
+      "description": "xxx短视频",
+      "rule": "<img alt=\"{%}\" {*}decoding=\"async\" draggable=\"false\" {*}loading=\"{*}\" src=\"https://www.xxxfollow.com/media/fans/post_public/{%}_small.webp{*}\"{*}>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "https://www.xxxfollow.com/media/fans/post_public/{%2}.mp4",
+        "content": "<video src=\"https://www.xxxfollow.com/media/fans/post_public/{%2}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://www.xxxfollow.com/media/fans/post_public/{%2}_small.webp\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer"
     }
   ]
 }
