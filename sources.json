@@ -121,46 +121,6 @@
       "proxy": "puppeteer"
     },
     {
-      "id": "phe69",
-      "name": "PHE69",
-      "url": "https://phe69.sbs/phim-sex-moi/",
-      "description": "国外视频",
-      "rule": "<div class=\"post-thumbnail-container\"><img class=\"video-main-thumb{*}\" width=\"300\" height=\"168.75\" src=\"https://phe69.sbs/wp-content/uploads/{%}/{%}/{%}.jpg\" alt=\"{%}\" data-was-processed=\"true\"></div>\t\t\t<div class=\"video-overlay\"></div>",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%4}",
-        "link": "https://phim.phe69.sbs/{%3}.mp4",
-        "content": "<video src=\"https://phim.phe69.sbs/{%3}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://phe69.sbs/wp-content/uploads/{%1}/{%2}/{%3}.jpg\"></video>"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": "puppeteer"
-    },
-    {
-      "id": "fulijianghu",
-      "name": "福利江湖",
-      "url": "https://b53.freeshare58.com/all",
-      "description": "视频预览图",
-      "rule": "<a href=\"https://b53.freeshare58.com/archives/{*}\" title=\"{*}\" target=\"_blank\" rel=\"bookmark\">\n        <img src=\"{%}\" class=\"thumb\" alt=\"{%}\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%2}",
-        "link": "https://b53.freeshare58.com{%1}",
-        "content": "<img src=\"https://b53.freeshare58.com{%1}\" width=\"100%\">"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": "puppeteer"
-    },
-    {
       "id": "theone",
       "name": "Twitter@The one",
       "url": "https://carryfeed.com/?url=ju266945",
@@ -219,26 +179,6 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
-    },
-    {
-      "id": "xiuren",
-      "name": "秀人网",
-      "url": "https://www.kanyouwu.com/zxfb",
-      "description": "秀人网写真",
-      "rule": "<img src=\"{%}\" data-src=\"{*}\" class=\"thumb\" alt=\"{%}\" style=\"\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%2}",
-        "link": "{%1}",
-        "content": "<img src=\"{%1}\" width=\"100%\">"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": false
     },
     {
       "id": "slideshow",
@@ -301,26 +241,6 @@
       "proxy": "puppeteer"
     },
     {
-      "id": "follow",
-      "name": "XXXfollow",
-      "url": "https://www.xxxfollow.com/men/newest-creators",
-      "description": "xxx短视频",
-      "rule": "<img alt=\"{%}\" {*}decoding=\"async\" draggable=\"false\" {*}loading=\"{*}\" src=\"https://www.xxxfollow.com/media/fans/post_public/{%}_small.webp{*}\"{*}>",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%1}",
-        "link": "https://www.xxxfollow.com/media/fans/post_public/{%2}.mp4",
-        "content": "<video src=\"https://www.xxxfollow.com/media/fans/post_public/{%2}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://www.xxxfollow.com/media/fans/post_public/{%2}_small.webp\"></video>"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": "puppeteer"
-    },
-    {
       "id": "xiaolanshipin",
       "name": "小蓝视频",
       "url": "https://djj5f452.top:13579/list/69",
@@ -335,26 +255,6 @@
         "title": "{%4}",
         "link": "https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8",
         "content": "视频链接：https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8\n<br>\n<img src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%1}/{%2}/320x180/{%3}.jpg\" width=\"240\">"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": "puppeteer"
-    },
-    {
-      "id": "16k",
-      "name": "16K",
-      "url": "https://16k.club/",
-      "description": "网络精选图片",
-      "rule": "<img src=\"https://{%}\" data-src=\"{*}\" alt=\"{%}\" width=\"{*}\" height=\"{*}\" class=\"{*}\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%2}",
-        "link": "https://spy.2133.dpdns.org/default/https/{%1}",
-        "content": "<img src=\"https://spy.2133.dpdns.org/default/https/{%1}\" width=\"240\">"
       },
       "maxItems": 50,
       "updateInterval": "6h",
