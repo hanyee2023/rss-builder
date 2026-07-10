@@ -401,10 +401,14 @@
                     <select id="proxyMode">
                         <option value="backend">模拟后端（推荐，与Actions一致）</option>
                         <option value="proxy">代理请求</option>
+                        <option value="custom">自定义代理</option>
                         <option value="direct">直接请求</option>
                         <option value="manual">手动粘贴</option>
                     </select>
-                    <div class="info-message">「模拟后端」使用和 GitHub Actions 相同的代理抓取，确保前后端 HTML 一致</div>
+                </div>
+                <div class="form-group" id="customProxyGroup" style="flex: 2; display: none;">
+                    <label for="customProxy">代理地址</label>
+                    <input type="text" id="customProxy" placeholder="https://api.allorigins.win/raw?url=">
                 </div>
             </div>
             <div class="btn-container">
@@ -644,6 +648,7 @@
         document.getElementById('parseBtn').addEventListener('click', parseSource);
         document.getElementById('clearSourceBtn').addEventListener('click', clearSource);
         document.getElementById('sourceHtml').addEventListener('input', onSourceInput);
+        document.getElementById('proxyMode').addEventListener('change', onProxyModeChange);
 
         // 第二步
         document.getElementById('extractBtn').addEventListener('click', extractContent);
@@ -705,6 +710,7 @@
                 if (mode === 'direct') html = await fetchDirect(url);
                 else if (mode === 'proxy') html = await fetchViaProxy(url);
                 else if (mode === 'backend') html = await fetchLikeBackend(url);
+                else if (mode === 'custom') html = await fetchWithCustomProxy(url);
                 if (html && html.trim().length > 0) { success = true; break; }
             } catch (err) {
                 errorMsg = err.message;
@@ -719,7 +725,7 @@
             state.currentSource = html;
             document.getElementById('sourceHtml').value = html;
             updateSourceLength();
-            const modeLabel = { backend: '模拟后端', proxy: '代理请求', direct: '直接请求' }[proxyMode] || proxyMode;
+            const modeLabel = { backend: '模拟后端', proxy: '代理请求', direct: '直接请求', custom: '自定义代理' }[proxyMode] || proxyMode;
             setStatus('parseStatus', `解析成功（${modeLabel}模式）✓ — 源码 ${html.length.toLocaleString()} 字符`, 'status-success');
             autoFillFromHtml(html, url);
         } else {
@@ -778,6 +784,40 @@
             }
         }
         throw new Error('所有代理均不可用');
+    }
+
+    function onProxyModeChange() {
+        const mode = document.getElementById('proxyMode').value;
+        document.getElementById('customProxyGroup').style.display = mode === 'custom' ? '' : 'none';
+    }
+
+    // 自定义代理请求 - 用户填入代理地址，灵活测试
+    async function fetchWithCustomProxy(url) {
+        let proxyBase = document.getElementById('customProxy').value.trim();
+        if (!proxyBase) throw new Error('请输入代理地址');
+
+        // 自动补全：如果用户只填了域名，自动拼接
+        if (!proxyBase.includes('url=')) {
+            proxyBase = proxyBase.endsWith('/') ? proxyBase : proxyBase + '/';
+            proxyBase = proxyBase + 'raw?url=';
+        }
+
+        const proxyUrl = proxyBase + encodeURIComponent(url);
+        console.log('自定义代理:', proxyUrl);
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000);
+        try {
+            const response = await fetch(proxyUrl, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            if (!text || text.trim().length < 10) throw new Error('返回内容为空');
+            return text;
+        } catch (err) {
+            clearTimeout(timeoutId);
+            throw new Error(`自定义代理失败: ${err.message}`);
+        }
     }
 
     // 模拟后端抓取 - 使用和 generate.js 完全相同的代理
