@@ -219,6 +219,26 @@
       "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer"
+    },
+    {
+      "id": "xiuren",
+      "name": "秀人网",
+      "url": "https://www.kanyouwu.com/zxfb",
+      "description": "秀人网写真",
+      "rule": "<img src=\"{%}\" data-src=\"{*}\" class=\"thumb\" alt=\"{%}\" style=\"\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "{%1}",
+        "content": "<img src=\"{%1}\" width=\"100%\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": false
     }
   ]
 }
