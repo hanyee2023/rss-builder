@@ -153,6 +153,11 @@ async function generateFeed(feed) {
         console.log('  --- 规则结束 ---');
     }
 
+    // 2.5 视频直链二次提取（按需）：跳转到详情页取真实视频地址
+    if (feed.videoExtract) {
+        await enrichWithVideoLinks(extractedData, { url, tpl, options, proxy, feed });
+    }
+
     // 3. 生成 RSS XML
     const rssXml = buildRssXml({
         title: name,
@@ -162,6 +167,7 @@ async function generateFeed(feed) {
         items: extractedData.slice(0, maxItems),
         tpl,
         baseUrl: url,
+        videoEmbed: feed.videoEmbed === true,
     });
 
     // 4. 写入文件
@@ -781,9 +787,330 @@ function decodeHtmlEntities(text) {
 }
 
 // ============================================================
+// 视频直链二次提取（深度跳转）
+// 当 feed.videoExtract 为 true 时，对每条目按 tpl.link 抓取详情页，
+// 再从详情页提取真实视频地址，回填到 row._video / row._poster。
+// 详情页只解析初始 HTML（og:video / JSON-LD / <video>），不启动 Puppeteer，
+// 因此比列表页快很多；若详情页是 JS 渲染的，可在 feed.videoRule 里写规则。
+// ============================================================
+
+// 并发受限的 map（避免一次性发起几十个请求打爆源站/触发限流）
+async function mapWithConcurrency(items, limit, fn) {
+    const results = new Array(items.length);
+    let idx = 0;
+    async function worker() {
+        while (idx < items.length) {
+            const cur = idx++;
+            results[cur] = await fn(items[cur], cur);
+        }
+    }
+    const n = Math.max(1, Math.min(limit, items.length));
+    const workers = [];
+    for (let i = 0; i < n; i++) workers.push(worker());
+    await Promise.all(workers);
+    return results;
+}
+
+// 详情页抓取：绝不启动 Puppeteer（只取初始 HTML 里的 meta/jsonld，速度远快于渲染）
+function fetchDetailPage(targetUrl, proxyConfig) {
+    if (proxyConfig && typeof proxyConfig === 'string' && proxyConfig.length > 0) {
+        return fetchWithProxy(targetUrl, 0, proxyConfig);
+    }
+    return fetchDirect(targetUrl, 0);
+}
+
+// 自动识别视频地址（无需用户写规则）：og:video → JSON-LD → <video>/<source>
+function extractVideoAuto(html) {
+    let video = pickMeta(html, ['og:video:secure_url', 'og:video:url', 'og:video', 'twitter:player:stream']);
+    let poster = pickMeta(html, ['og:image:secure_url', 'og:image:url', 'og:image']);
+    if (!video) {
+        const ld = extractJsonLdVideo(html);
+        if (ld) { video = video || ld.video; poster = poster || ld.poster; }
+    }
+    if (!video) {
+        const m = html.match(/<video[^>]*\ssrc=["']([^"']+)["']/i) || html.match(/<source[^>]*\ssrc=["']([^"']+)["']/i);
+        if (m) video = m[1];
+        const pm = html.match(/<video[^>]*\sposter=["']([^"']+)["']/i);
+        if (pm) poster = pm[1];
+    }
+    if (video) video = decodeHtmlEntities(video.trim());
+    if (poster) poster = decodeHtmlEntities(poster.trim());
+    return { video: video || null, poster: poster || null };
+}
+
+// 读取 <meta property|name="x" content="y">（兼容两种属性书写顺序）
+function pickMeta(html, props) {
+    for (const p of props) {
+        const m1 = html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${p}["'][^>]*\\scontent=["']([^"']+)["']`, 'i'));
+        if (m1 && m1[1]) return m1[1];
+        const m2 = html.match(new RegExp(`<meta[^>]+\\scontent=["']([^"']+)["'][^>]*(?:property|name)=["']${p}["']`, 'i'));
+        if (m2 && m2[1]) return m2[1];
+    }
+    return null;
+}
+
+// 解析 JSON-LD 中的 VideoObject
+function extractJsonLdVideo(html) {
+    const re = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+    let m;
+    while ((m = re.exec(html)) !== null) {
+        try {
+            const data = JSON.parse(m[1]);
+            const found = findVideoInJsonLd(data);
+            if (found) return found;
+        } catch (e) { /* ignore parse error */ }
+    }
+    return null;
+}
+function findVideoInJsonLd(obj) {
+    if (!obj || typeof obj !== 'object') return null;
+    if (Array.isArray(obj)) { for (const it of obj) { const r = findVideoInJsonLd(it); if (r) return r; } return null; }
+    if (obj['@graph']) { const r = findVideoInJsonLd(obj['@graph']); if (r) return r; }
+    const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
+    if (types.includes('VideoObject') && obj.contentUrl) {
+        return { video: obj.contentUrl, poster: obj.thumbnailUrl || obj.thumbnail || null };
+    }
+    for (const k of Object.keys(obj)) {
+        const r = findVideoInJsonLd(obj[k]);
+        if (r) return r;
+    }
+    return null;
+}
+
+// 解析 JSON-LD 中“所有” VideoObject
+function extractJsonLdVideos(html) {
+    const re = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+    const out = [];
+    let m;
+    while ((m = re.exec(html)) !== null) {
+        try { const data = JSON.parse(m[1]); findAllVideosInJsonLd(data, out); } catch (e) {}
+    }
+    return out;
+}
+function findAllVideosInJsonLd(obj, out) {
+    if (!obj || typeof obj !== 'object') return;
+    if (Array.isArray(obj)) { obj.forEach(it => findAllVideosInJsonLd(it, out)); return; }
+    if (obj['@graph']) findAllVideosInJsonLd(obj['@graph'], out);
+    const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
+    if (types.includes('VideoObject') && obj.contentUrl) {
+        out.push({ video: obj.contentUrl, poster: obj.thumbnailUrl || obj.thumbnail || null });
+    }
+    for (const k of Object.keys(obj)) findAllVideosInJsonLd(obj[k], out);
+}
+
+// 自动识别“所有”视频地址（og:video / JSON-LD / <video>/<source>），用于“全部(enclosure)”模式
+function extractVideoAutoAll(html) {
+    const out = [];
+    const ogv = pickMeta(html, ['og:video:secure_url', 'og:video:url', 'og:video', 'twitter:player:stream']);
+    const ogp = pickMeta(html, ['og:image:secure_url', 'og:image:url', 'og:image']);
+    if (ogv) out.push({ video: ogv, poster: ogp });
+    extractJsonLdVideos(html).forEach(v => out.push(v));
+    const videoTags = html.match(/<video\b[^>]*>/gi) || [];
+    videoTags.forEach(tag => {
+        const src = (tag.match(/\ssrc=["']([^"']+)["']/i) || [])[1];
+        const poster = (tag.match(/\sposter=["']([^"']+)["']/i) || [])[1];
+        if (src) out.push({ video: src, poster: poster || null });
+    });
+    const sourceTags = html.match(/<source\b[^>]*>/gi) || [];
+    sourceTags.forEach(tag => {
+        const src = (tag.match(/\ssrc=["']([^"']+)["']/i) || [])[1];
+        if (src) out.push({ video: src, poster: null });
+    });
+    const seen = new Set();
+    const cleaned = [];
+    for (const o of out) {
+        if (!o.video) continue;
+        const k = o.video.trim();
+        if (seen.has(k)) continue;
+        seen.add(k);
+        cleaned.push({ video: decodeHtmlEntities(k), poster: o.poster ? decodeHtmlEntities(o.poster.trim()) : null });
+    }
+    return cleaned;
+}
+
+// 自动识别“所有”图片地址（og:image / JSON-LD / <img>）
+function extractImagesAuto(html) {
+    const out = [];
+    const ogp = pickMeta(html, ['og:image:secure_url', 'og:image:url', 'og:image']);
+    if (ogp) out.push(ogp);
+    extractJsonLdImages(html).forEach(u => out.push(u));
+    const imgTags = html.match(/<img\b[^>]*>/gi) || [];
+    imgTags.forEach(tag => {
+        const src = (tag.match(/\ssrc=["']([^"']+)["']/i) || [])[1];
+        if (src) out.push(src);
+    });
+    const seen = new Set();
+    const cleaned = [];
+    for (const u of out) {
+        const k = (u || '').trim();
+        if (!k || seen.has(k)) continue;
+        seen.add(k);
+        cleaned.push(decodeHtmlEntities(k));
+    }
+    return cleaned;
+}
+function extractJsonLdImages(html) {
+    const re = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+    const out = [];
+    let m;
+    while ((m = re.exec(html)) !== null) {
+        try { const data = JSON.parse(m[1]); findAllImagesInJsonLd(data, out); } catch (e) {}
+    }
+    return out;
+}
+function findAllImagesInJsonLd(obj, out) {
+    if (!obj || typeof obj !== 'object') return;
+    if (Array.isArray(obj)) { obj.forEach(it => findAllImagesInJsonLd(it, out)); return; }
+    if (obj['@graph']) findAllImagesInJsonLd(obj['@graph'], out);
+    const types = Array.isArray(obj['@type']) ? obj['@type'] : [obj['@type']];
+    if (types.includes('ImageObject') && obj.contentUrl) out.push(obj.contentUrl);
+    ['image', 'thumbnailUrl', 'contentUrl'].forEach(k => {
+        const v = obj[k];
+        if (typeof v === 'string' && /^https?:\/\//.test(v)) out.push(v);
+    });
+    for (const k of Object.keys(obj)) findAllImagesInJsonLd(obj[k], out);
+}
+
+// HEAD 请求拿 Content-Length（用于“取文件最大”策略）
+function headContentLength(u) {
+    return new Promise((resolve) => {
+        const ctrl = setTimeout(() => resolve(0), 4000);
+        try {
+            const parsed = new URL(u);
+            const client = parsed.protocol === 'https:' ? https : http;
+            const req = client.request({
+                method: 'HEAD',
+                hostname: parsed.hostname,
+                port: parsed.port || (parsed.protocol === 'https:' ? 443 : 80),
+                path: parsed.pathname + parsed.search,
+                headers: { 'User-Agent': DEFAULT_USER_AGENT },
+            }, (res) => {
+                clearTimeout(ctrl);
+                const len = parseInt(res.headers['content-length'] || '0', 10);
+                resolve(len || 0);
+                res.resume();
+            });
+            req.on('error', () => { clearTimeout(ctrl); resolve(0); });
+            req.setTimeout(4000, () => { req.destroy(); resolve(0); });
+            req.end();
+        } catch (e) { clearTimeout(ctrl); resolve(0); }
+    });
+}
+async function pickLargestVideo(videos) {
+    if (videos.length <= 1) return videos[0] || null;
+    const scored = await Promise.all(videos.map(async (v) => {
+        const len = await headContentLength(v.video);
+        return { v, len: len || 0 };
+    }));
+    scored.sort((a, b) => b.len - a.len);
+    return scored[0].v;
+}
+
+// 主流程：给提取结果补充视频/图片直链（二次抓取）
+async function enrichWithVideoLinks(rows, ctx) {
+    const { url, tpl, options, proxy, feed } = ctx;
+    const max = Math.min(rows.length, feed.deepExtractMax || 12);
+    const budgetMs = 45000; // 单次构建总预算，避免详情页过多拖垮 60s 超时
+    // 详情页地址：默认用条目链接模板，可在 feed.videoUrlTpl 覆盖（例如列表链接与视频页不是同一地址时）
+    const detailTpl = (feed.videoUrlTpl && feed.videoUrlTpl.trim()) ? feed.videoUrlTpl.trim() : (tpl.link || '{%2}');
+    const videoSelect = feed.videoSelect || 'first'; // first | largest | all
+    const start = Date.now();
+    const slice = rows.slice(0, max);
+    await mapWithConcurrency(slice, 4, async (row) => {
+        if (Date.now() - start > budgetMs) return;
+        try {
+            const detailLink = applyTemplate(detailTpl, row);
+            if (!detailLink) return;
+            let absUrl;
+            try { absUrl = new URL(detailLink, url).href; } catch (e) { return; }
+            const detailHtml = await withTimeout(fetchDetailPage(absUrl, proxy), 15000, '详情页抓取超时');
+
+            // ---- 视频 ----
+            let videos = [];
+            if (feed.videoRule && feed.videoRule.trim()) {
+                const vr = extractWithRule(detailHtml, feed.videoRule, options);
+                videos = vr.map(r => ({ video: r[0], poster: r[1] || null })).filter(v => v.video);
+            } else {
+                videos = extractVideoAutoAll(detailHtml);
+            }
+            videos = videos.map(v => {
+                try { v.video = new URL(v.video, absUrl).href; if (v.poster) v.poster = new URL(v.poster, absUrl).href; } catch (e) {}
+                return v;
+            }).filter(v => !!v.video);
+
+            if (videos.length) {
+                let chosen;
+                if (videoSelect === 'all') chosen = videos;
+                else if (videoSelect === 'largest') chosen = [await pickLargestVideo(videos)];
+                else chosen = [videos[0]];
+                row._videos = chosen;
+                row._video = chosen[0].video;     // 兼容 {video} 令牌
+                row._poster = chosen[0].poster;   // 兼容 {poster} 令牌
+            }
+
+            // ---- 图片（多张） ----
+            let images = [];
+            if (feed.imageRule && feed.imageRule.trim()) {
+                const ir = extractWithRule(detailHtml, feed.imageRule, options);
+                images = ir.map(r => r[0]).filter(Boolean);
+            } else {
+                images = extractImagesAuto(detailHtml);
+            }
+            // 去重，避免重复 <enclosure>
+            const seenImg = new Set();
+            images = images.filter(u => { const k = (u || '').trim(); if (!k || seenImg.has(k)) return false; seenImg.add(k); return true; });
+            images = images.map(u => { try { return new URL(u, absUrl).href; } catch (e) { return u; } }).filter(Boolean);
+            if (images.length) row._images = images;
+
+        } catch (e) {
+            console.warn(`  二次提取失败（该条目跳过）: ${e.message}`);
+        }
+    });
+    const gotV = rows.filter(r => r._video).length;
+    const gotI = rows.filter(r => r._images && r._images.length).length;
+    console.log(`  二次提取完成: 视频 ${gotV}/${max} 条, 图片 ${gotI}/${max} 条`);
+}
+
+// 模板特殊令牌：{video} / {poster} / {images}（仅在启用了二次提取时有值）
+function applySpecialTokens(str, row) {
+    if (!str) return str;
+    const video = (row && row._video) || '';
+    const poster = (row && row._poster) || '';
+    const images = (row && row._images && row._images.length) ? row._images : [];
+    const imagesHtml = images.map(u => `<img src="${u}" style="max-width:100%;margin:6px 0;border-radius:6px;" />`).join('\n');
+    return str
+        .replace(/\{video\}/g, video)
+        .replace(/\{poster\}/g, poster)
+        .replace(/\{images\}/g, imagesHtml);
+}
+
+// 根据扩展名猜测 MIME（用于 enclosure type）
+function guessMime(u) {
+    const lower = (u.split('?')[0] || '').toLowerCase();
+    if (lower.endsWith('.m3u8')) return 'application/vnd.apple.mpegurl';
+    if (lower.endsWith('.mpd')) return 'application/dash+xml';
+    if (lower.endsWith('.webm')) return 'video/webm';
+    if (lower.endsWith('.mkv')) return 'video/x-matroska';
+    if (lower.endsWith('.mov')) return 'video/quicktime';
+    return 'video/mp4';
+}
+
+// 根据扩展名猜测图片 MIME（用于图片 <enclosure> 的 type）
+function guessImageMime(u) {
+    const lower = (u.split('?')[0] || '').toLowerCase();
+    if (lower.endsWith('.png')) return 'image/png';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    if (lower.endsWith('.gif')) return 'image/gif';
+    if (lower.endsWith('.avif')) return 'image/avif';
+    if (lower.endsWith('.svg')) return 'image/svg+xml';
+    if (lower.endsWith('.bmp')) return 'image/bmp';
+    return 'image/jpeg';
+}
+
+// ============================================================
 // 构建 RSS XML
 // ============================================================
-function buildRssXml({ title, description, link, language, items, tpl, baseUrl }) {
+function buildRssXml({ title, description, link, language, items, tpl, baseUrl, videoEmbed = false }) {
     const now = new Date().toUTCString();
 
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
@@ -798,9 +1125,12 @@ function buildRssXml({ title, description, link, language, items, tpl, baseUrl }
     xml += `  <language>${language}</language>\n`;
 
     items.forEach((row, index) => {
-        let itemTitle = applyTemplate(tpl.title || '{%1}', row);
-        let itemLink = applyTemplate(tpl.link || '{%2}', row);
-        let itemContent = applyTemplate(tpl.content || '{%3}', row);
+        let itemTitle = applySpecialTokens(applyTemplate(tpl.title || '{%1}', row), row);
+        let itemLink = applySpecialTokens(applyTemplate(tpl.link || '{%2}', row), row);
+        let itemContent = applySpecialTokens(applyTemplate(tpl.content || '{%3}', row), row);
+
+        const videos = (row._videos && row._videos.length) ? row._videos : null;
+        const images = (row._images && row._images.length) ? row._images : null;
 
         // URL 补全
         if (itemLink && baseUrl) {
@@ -818,6 +1148,22 @@ function buildRssXml({ title, description, link, language, items, tpl, baseUrl }
         // title 使用转义方式，兼容性更好
         xml += `    <title>${escapeXml(itemTitle)}</title>\n`;
         xml += `    <link>${escapeXml(itemLink)}</link>\n`;
+        // 视频直链：一个或多个 <enclosure>（播客/阅读器可直接识别并播放），必须位于 <item> 内部
+        if (videos) {
+            videos.forEach(v => {
+                xml += `    <enclosure url="${escapeXml(v.video)}" type="${guessMime(v.video)}" />\n`;
+            });
+            // 可选：在内容中内嵌 <video> 播放器（仅内嵌第一个）
+            if (videoEmbed && videos[0]) {
+                itemContent += `\n<video src="${escapeXml(videos[0].video)}"${videos[0].poster ? ` poster="${escapeXml(videos[0].poster)}"` : ''} controls playsinline preload="metadata"></video>`;
+            }
+        }
+        // 图片直链：每张一个 <enclosure>，便于阅读器/Hugo 等聚合
+        if (images) {
+            images.forEach(img => {
+                xml += `    <enclosure url="${escapeXml(img)}" type="${guessImageMime(img)}" />\n`;
+            });
+        }
         // description（内容）使用 CDATA，因为可能包含 HTML
         xml += `    <description><![CDATA[${escapeCdata(itemContent)}]]></description>\n`;
         xml += `    <guid isPermaLink="false">${escapeXml(guid)}</guid>\n`;
@@ -923,7 +1269,28 @@ function copyRssBuilder() {
 // ============================================================
 // 启动
 // ============================================================
-main().catch(err => {
-    console.error('致命错误:', err);
-    process.exit(1);
-});
+// 作为模块被 require 时导出内部函数（便于单元测试），且不自动运行 main
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        extractVideoAuto,
+        extractVideoAutoAll,
+        extractImagesAuto,
+        pickMeta,
+        extractJsonLdVideo,
+        guessMime,
+        guessImageMime,
+        applySpecialTokens,
+        extractWithRule,
+        enrichWithVideoLinks,
+        applyTemplate,
+        buildRssXml,
+    };
+}
+
+// 仅在直接运行（node generate.js）时执行主流程
+if (require.main === module) {
+    main().catch(err => {
+        console.error('致命错误:', err);
+        process.exit(1);
+    });
+}

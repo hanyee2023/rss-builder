@@ -521,6 +521,79 @@
         .puppeteer-help strong {
             color: #d46b08;
         }
+
+        /* 标签页导航 */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .tab-btn {
+            padding: 10px 22px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .tab-btn:hover { color: #1677ff; }
+        .tab-btn.active {
+            color: #1677ff;
+            border-bottom-color: #1677ff;
+        }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* 视频提取选项 */
+        /* 第三步内部子标签：列表页 / 详情页 */
+        .sub-tab-nav {
+            display: flex;
+            gap: 8px;
+            margin: 4px 0 16px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .sub-tab-btn {
+            padding: 9px 18px;
+            border: none;
+            background: transparent;
+            color: #6c757d;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .sub-tab-btn:hover { color: #1677ff; }
+        .sub-tab-btn.active {
+            color: #1677ff;
+            border-bottom-color: #1677ff;
+        }
+        .sub-tab-panel { display: none; }
+        .sub-tab-panel.active { display: block; }
+
+        .video-extract-box {
+            margin-top: 12px;
+            padding: 12px 14px;
+            background: #f9f0ff;
+            border: 1px solid #efd6ff;
+            border-radius: 6px;
+        }
+        .video-extract-box .rule-help {
+            margin-top: 8px;
+        }
+        .tag-video {
+            background: #f9f0ff;
+            color: #722ed1;
+            border: 1px solid #efd6ff;
+        }
     </style>
 </head>
 <body>
@@ -530,6 +603,13 @@
             <p>四步生成可自动更新的 RSS 订阅源 &middot; 基于 GitHub Actions</p>
         </div>
 
+        <!-- 标签页导航 -->
+        <div class="tab-nav">
+            <button type="button" class="tab-btn active" id="tabBtnGenerator" data-tab="tab-generator">🛠 生成器</button>
+            <button type="button" class="tab-btn" id="tabBtnManage" data-tab="tab-manage">📋 订阅源管理</button>
+        </div>
+
+        <div id="tab-generator" class="tab-panel active">
         <!-- 第一步：粘贴网页源码 -->
         <div class="step-section">
             <h2 class="step-title">
@@ -621,46 +701,102 @@
                     <input type="text" id="rssDescription" placeholder="简短描述">
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="tplTitle">条目标题模板</label>
-                    <input type="text" id="tplTitle" value="{%1}" placeholder="例如：{%1}">
+
+            <!-- 子标签：列表页（单次抓取） / 详情页（二次抓取） -->
+            <div class="sub-tab-nav">
+                <button type="button" class="sub-tab-btn active" data-subtab="subList">📄 列表页（单次抓取）</button>
+                <button type="button" class="sub-tab-btn" data-subtab="subDetail">🔗 详情页（二次抓取）</button>
+            </div>
+
+            <!-- 列表页：单次抓取（一次拿到标题/链接/内容） -->
+            <div id="subList" class="sub-tab-panel active">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tplTitle">条目标题模板</label>
+                        <input type="text" id="tplTitle" value="{%1}" placeholder="例如：{%1}">
+                    </div>
+                    <div class="form-group">
+                        <label for="tplLink">条目链接模板 <span style="color:#999;font-weight:400;">（＝二次抓取地址）</span></label>
+                        <input type="text" id="tplLink" value="{%2}" placeholder="例如：{%2}">
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="tplLink">条目链接模板</label>
-                    <input type="text" id="tplLink" value="{%2}" placeholder="例如：{%2}">
+                <div class="form-row">
+                    <div class="form-group form-group-full">
+                        <label for="tplContent">条目内容模板</label>
+                        <textarea id="tplContent" class="content-template-area" placeholder="使用 {%1} {%2} 引用字段">{%3}</textarea>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="updateInterval">更新频率</label>
+                        <select id="updateInterval">
+                            <option value="hourly">每小时</option>
+                            <option value="daily" selected>每天</option>
+                            <option value="6h">每6小时</option>
+                            <option value="12h">每12小时</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="maxItems">最大条目数</label>
+                        <input type="number" id="maxItems" value="50" min="1" max="200">
+                    </div>
+                    <div class="form-group">
+                        <label for="feedId">Feed ID</label>
+                        <input type="text" id="feedId" placeholder="feed-1" value="feed-1">
+                    </div>
+                </div>
+                <div class="checkbox-group" style="margin-top: 4px;">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="useProxy">
+                        <span>使用 Puppeteer 渲染（JS 动态网页必选）</span>
+                    </label>
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group form-group-full">
-                    <label for="tplContent">条目内容模板</label>
-                    <textarea id="tplContent" class="content-template-area" placeholder="使用 {%1} {%2} 引用字段">{%3}</textarea>
+
+            <!-- 详情页：二次抓取（跳详情页拿视频/图片真实地址） -->
+            <div id="subDetail" class="sub-tab-panel">
+                <div class="video-extract-box">
+                    <div class="checkbox-group" style="margin-top: 0;">
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="videoExtract">
+                            <span>启用二次抓取（跳详情页提取视频/图片真实地址）</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" id="videoEmbed">
+                            <span>在内容中内嵌 &lt;video&gt; 播放器（仅视频）</span>
+                        </label>
+                    </div>
+                    <div class="form-row" style="margin-top: 8px;">
+                        <div class="form-group" style="max-width: 220px;">
+                            <label for="deepExtractMax">二次抓取最大条数</label>
+                            <input type="number" id="deepExtractMax" value="12" min="1" max="50">
+                        </div>
+                        <div class="form-group" style="max-width: 220px;">
+                            <label for="videoSelect">多视频处理</label>
+                            <select id="videoSelect">
+                                <option value="first" selected>取第一个</option>
+                                <option value="largest">取文件最大</option>
+                                <option value="all">全部（多条 enclosure）</option>
+                            </select>
+                        </div>
+                    </div>
+                    <label for="videoUrlTpl">二次抓取地址模板（可选，<strong>默认不用填</strong>）</label>
+                    <input type="text" id="videoUrlTpl" placeholder="留空＝使用上方「条目链接模板」，例如：{%1}" style="margin-bottom:6px;">
+                    <label for="videoRule">视频链接规则（可选，留空则自动识别 og:video / JSON-LD / &lt;video&gt;）</label>
+                    <textarea id="videoRule" class="rule-area" placeholder="第1组=视频地址，第2组=封面图，例如：&#10;&lt;meta property=&quot;og:video&quot; content=&quot;{%}&quot;&gt;&#10;或&#10;&lt;video src=&quot;{%}&quot; poster=&quot;{%}&quot;&gt;"></textarea>
+                    <label for="imageRule" style="margin-top:8px;">图片链接规则（可选，留空则自动抓取详情页所有图片，多张=多条 enclosure）</label>
+                    <textarea id="imageRule" class="rule-area" placeholder="第1组=图片地址，例如：&#10;&lt;img src=&quot;{%}&quot; class=&quot;photo&quot;&gt;"></textarea>
+                    <div class="rule-help">
+                        <strong>二次抓取跳哪个网址？</strong> 默认就是「列表页·条目链接模板」抓到的每条链接，<span style="color:#d63384;">你不用单独填二次跳转网址</span>；只有列表链接和视频/图片页不是同一地址时，才填上面的「二次抓取地址模板」。<br>
+                        <strong>会不会抓错对应条目？</strong> 每条目各自用<strong>自己的链接</strong>跳详情页，抓到的视频/图片天然属于该条目，不会串。<br>
+                        <strong>最终 RSS 输出字段（由你定义）：</strong><br>
+                        · 标题 ← 条目标题模板　· 链接 ← 条目链接模板<br>
+                        · 视频 ← 二次抓取（可选）　· 封面 ← 二次抓取第 2 组（可选）<br>
+                        · 图片 ← 二次抓取（可选，多张=多条 &lt;enclosure&gt;）<br>
+                        后端逐个抓取详情页，把真实地址写入 RSS 的 <code>&lt;enclosure&gt;</code>；内容模板也可用 <code>{video}</code> / <code>{poster}</code> / <code>{images}</code> 令牌。<br>
+                        ⚠️ 视频/图片直链由 <strong>GitHub Actions 后台</strong>抓取（浏览器受跨域限制无法在前端抓），<strong>保存后约 1-2 分钟才出现在 RSS</strong>，本页预览不显示。
+                    </div>
                 </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="updateInterval">更新频率</label>
-                    <select id="updateInterval">
-                        <option value="hourly">每小时</option>
-                        <option value="daily" selected>每天</option>
-                        <option value="6h">每6小时</option>
-                        <option value="12h">每12小时</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="maxItems">最大条目数</label>
-                    <input type="number" id="maxItems" value="50" min="1" max="200">
-                </div>
-                <div class="form-group">
-                    <label for="feedId">Feed ID</label>
-                    <input type="text" id="feedId" placeholder="feed-1" value="feed-1">
-                </div>
-            </div>
-            <div class="checkbox-group" style="margin-top: 4px;">
-                <label class="checkbox-item">
-                    <input type="checkbox" id="useProxy">
-                    <span>使用 Puppeteer 渲染（JS 动态网页必选）</span>
-                </label>
             </div>
 
             <!-- GitHub配置 -->
@@ -758,7 +894,10 @@
             </div>
         </div>
 
+        </div><!-- /tab-generator -->
+
         <!-- 第五步：已添加的订阅源管理 -->
+        <div id="tab-manage" class="tab-panel">
         <div class="step-section">
             <h2 class="step-title">
                 <span class="step-number">5</span>
@@ -766,9 +905,10 @@
             </h2>
             <div class="btn-container">
                 <button id="refreshListBtn" class="btn-secondary">刷新列表</button>
+                <button id="newFeedBtn" class="btn-success">+ 新建订阅源</button>
             </div>
             <div id="feedList" class="feed-list">
-                <div class="feed-list-empty">点击「一键保存并生成 RSS」后，订阅源会出现在这里</div>
+                <div class="feed-list-empty">正在从 GitHub 读取订阅源列表...</div>
             </div>
             <div class="puppeteer-help">
                 <strong>如何判断是否需要 Puppeteer？</strong><br>
@@ -776,6 +916,7 @@
                 简单判断：F12 源码很长（>50KB）且包含目标内容 → 一般是 JS 渲染，建议勾选。
             </div>
         </div>
+        </div><!-- /tab-manage -->
     </div>
 
     <script>
@@ -810,6 +951,22 @@
     // 事件绑定
     // ============================================================
     function bindEvents() {
+        // 标签页切换
+        document.getElementById('tabBtnGenerator').addEventListener('click', () => switchTab('tab-generator'));
+        document.getElementById('tabBtnManage').addEventListener('click', () => switchTab('tab-manage'));
+
+        // 第三步内部子标签：列表页 / 详情页
+        document.querySelectorAll('.sub-tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-subtab');
+                document.querySelectorAll('.sub-tab-panel').forEach(p => p.classList.remove('active'));
+                document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+                const panel = document.getElementById(id);
+                if (panel) panel.classList.add('active');
+                btn.classList.add('active');
+            });
+        });
+
         // 第一步
         document.getElementById('sourceHtml').addEventListener('input', onSourceInput);
 
@@ -834,7 +991,8 @@
 
         // 第四步
         document.getElementById('workerUrl').addEventListener('input', saveWorkerUrl);
-        document.getElementById('refreshListBtn').addEventListener('click', () => { cachedExistingFeeds = null; renderFeedList(); });
+        document.getElementById('refreshListBtn').addEventListener('click', () => refreshFromGitHub());
+        document.getElementById('newFeedBtn').addEventListener('click', () => { resetGeneratorForm(); switchTab('tab-generator'); });
         document.getElementById('generateJsonBtn').addEventListener('click', () => generateJsonConfig(true));
         document.getElementById('copyJsonBtn').addEventListener('click', copyJsonConfig);
         document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonConfig);
@@ -1059,6 +1217,10 @@
             let title = applyTemplate(tplTitle, row);
             let link = applyTemplate(tplLink, row);
             let description = applyTemplate(tplContent, row);
+            // 特殊令牌（与后端一致）：{video}/{poster}（前端预览无视频时为空）
+            title = applySpecialTokens(title, row);
+            link = applySpecialTokens(link, row);
+            description = applySpecialTokens(description, row);
 
             if (link) {
                 try { link = new URL(link).href; } catch (e) {}
@@ -1097,6 +1259,13 @@
             maxItems: maxItems,
             updateInterval: document.getElementById('updateInterval').value,
             proxy: document.getElementById('useProxy').checked ? 'puppeteer' : false,
+            videoExtract: document.getElementById('videoExtract').checked,
+            videoUrlTpl: document.getElementById('videoUrlTpl').value.trim(),
+            videoRule: document.getElementById('videoRule').value.trim(),
+            imageRule: document.getElementById('imageRule').value.trim(),
+            videoSelect: document.getElementById('videoSelect').value,
+            videoEmbed: document.getElementById('videoEmbed').checked,
+            deepExtractMax: parseInt(document.getElementById('deepExtractMax').value, 10) || 12,
         };
 
         updateRssLinkDisplay();
@@ -1108,6 +1277,19 @@
             result = result.split(`{%${i + 1}}`).join(row[i] || '');
         }
         return result;
+    }
+
+    // 特殊令牌：{video} / {poster} / {images}（与后端 generate.js 一致）
+    function applySpecialTokens(str, row) {
+        if (!str) return str;
+        const video = (row && row._video) || '';
+        const poster = (row && row._poster) || '';
+        const images = (row && row._images && row._images.length) ? row._images : [];
+        const imagesHtml = images.map(u => `<img src="${u}" style="max-width:100%;margin:6px 0;border-radius:6px;" />`).join('\n');
+        return str
+            .replace(/\{video\}/g, video)
+            .replace(/\{poster\}/g, poster)
+            .replace(/\{images\}/g, imagesHtml);
     }
 
     function escapeCdata(text) {
@@ -1181,17 +1363,23 @@
 
     // 缓存已读取的订阅源列表，避免连续添加时需要每次请求 GitHub
     let cachedExistingFeeds = null;
+    let lastFetchError = null; // 记录最近一次从 GitHub 拉取列表是否出错
 
     // 从 GitHub 读取已有的订阅源列表（带缓存）
     async function fetchExistingFeeds(forceRefresh = false) {
-        // 只要有缓存就用缓存，不强制刷新
+        // 强制刷新时清空缓存，重新拉取
+        if (forceRefresh) {
+            cachedExistingFeeds = null;
+            lastFetchError = null;
+        }
+        // 非强制刷新且有缓存就用缓存
         if (cachedExistingFeeds) {
             return cachedExistingFeeds;
         }
 
         const ghUsername = document.getElementById('ghUsername').value.trim();
         const ghRepo = document.getElementById('ghRepo').value.trim();
-        if (!ghUsername || !ghRepo) return [];
+        if (!ghUsername || !ghRepo) { lastFetchError = '未配置 GitHub 用户名/仓库'; return []; }
 
         try {
             const ghFileUrl = `https://raw.githubusercontent.com/${ghUsername}/${ghRepo}/main/sources.json?t=${Date.now()}`;
@@ -1200,13 +1388,62 @@
                 const existing = await resp.json();
                 if (existing.feeds && Array.isArray(existing.feeds)) {
                     cachedExistingFeeds = JSON.parse(JSON.stringify(existing.feeds)); // 深拷贝
+                    lastFetchError = null;
                     return cachedExistingFeeds;
                 }
+                // 文件存在但无 feeds 数组
+                cachedExistingFeeds = [];
+                return cachedExistingFeeds;
             }
+            lastFetchError = `GitHub 返回 ${resp.status}（仓库名/分支是否正确？文件是否公开？）`;
         } catch (e) {
+            lastFetchError = e.message || '网络错误';
             console.warn('读取已有 sources.json 失败:', e);
         }
         return cachedExistingFeeds || [];
+    }
+
+    // 从 GitHub 重新拉取并渲染订阅源列表（打开管理标签 / 点刷新时调用）
+    async function refreshFromGitHub() {
+        const container = document.getElementById('feedList');
+        container.innerHTML = '<div class="feed-list-empty">正在从 GitHub 读取订阅源列表...</div>';
+        const feeds = await fetchExistingFeeds(true);
+        if (lastFetchError) {
+            container.innerHTML = `<div class="feed-list-empty" style="border-color:#ffccc7;color:#a8071a;">` +
+                `无法从 GitHub 读取列表：${escapeHtml(lastFetchError)}<br>` +
+                `（仍可正常保存，保存后会自动出现在这里）</div>`;
+            return;
+        }
+        renderFeedList();
+    }
+
+    // 清空生成器表单，准备新建一个订阅源
+    function resetGeneratorForm() {
+        if (!confirm('确定清空当前表单，新建一个订阅源吗？')) return;
+        ['targetUrl', 'rssTitle', 'rssDescription', 'ruleInput', 'tplTitle', 'tplLink', 'tplContent',
+         'feedId', 'videoUrlTpl', 'videoRule', 'imageRule']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+        document.getElementById('sourceHtml').value = '';
+        document.getElementById('previewBox').value = '';
+        document.getElementById('rssPreview').value = '';
+        document.getElementById('jsonPreview').textContent = '';
+        document.getElementById('feedId').value = 'feed-' + Date.now().toString(36);
+        document.getElementById('tplTitle').value = '{%1}';
+        document.getElementById('tplLink').value = '{%2}';
+        document.getElementById('tplContent').value = '{%3}';
+        document.getElementById('maxItems').value = '50';
+        document.getElementById('updateInterval').value = 'daily';
+        ['stripHtml', 'decodeEntities', 'trimContent', 'useProxy', 'videoExtract', 'videoEmbed']
+            .forEach(id => { document.getElementById(id).checked = (id === 'stripHtml' || id === 'decodeEntities' || id === 'trimContent'); });
+        document.getElementById('deepExtractMax').value = '12';
+        document.getElementById('videoSelect').value = 'first';
+        state.currentSource = '';
+        state.extractedData = [];
+        state.currentFeedConfig = null;
+        state.currentRssXml = '';
+        state.currentJsonConfig = null;
+        updateSourceLength();
+        setStatus('parseStatus', '已清空，可粘贴新网页源码', 'status-text');
     }
 
     // 生成 sources.json（预览只显示当前订阅源）
@@ -1401,11 +1638,14 @@
             const proxyTag = feed.proxy === 'puppeteer'
                 ? '<span class="feed-item-tag tag-puppeteer">Puppeteer</span>'
                 : '<span class="feed-item-tag tag-direct">直接抓取</span>';
+            const videoTag = feed.videoExtract
+                ? '<span class="feed-item-tag tag-video">视频提取</span>'
+                : '';
             const rssLink = `https://${ghUser}.github.io/${ghRepo}/feeds/${feed.id}.xml`;
             return `
                 <div class="feed-item">
                     <div class="feed-item-info">
-                        <div class="feed-item-name">${escapeHtml(feed.name || feed.id)} ${proxyTag}</div>
+                        <div class="feed-item-name">${escapeHtml(feed.name || feed.id)} ${proxyTag}${videoTag}</div>
                         <div class="feed-item-url">${escapeHtml(feed.url)}</div>
                         <div class="feed-item-url" style="color:#1677ff;">RSS: <a href="${rssLink}" target="_blank">${feed.id}.xml</a></div>
                     </div>
@@ -1435,6 +1675,13 @@
         document.getElementById('maxItems').value = feed.maxItems || 50;
         document.getElementById('updateInterval').value = feed.updateInterval || 'daily';
         document.getElementById('useProxy').checked = feed.proxy === 'puppeteer';
+        document.getElementById('videoExtract').checked = feed.videoExtract === true;
+        document.getElementById('videoUrlTpl').value = feed.videoUrlTpl || '';
+        document.getElementById('videoEmbed').checked = feed.videoEmbed === true;
+        document.getElementById('videoRule').value = feed.videoRule || '';
+        document.getElementById('imageRule').value = feed.imageRule || '';
+        document.getElementById('videoSelect').value = feed.videoSelect || 'first';
+        document.getElementById('deepExtractMax').value = feed.deepExtractMax || 12;
 
         if (feed.options) {
             document.getElementById('stripHtml').checked = feed.options.stripHtml !== false;
@@ -1493,6 +1740,22 @@
         if (!el) return;
         el.innerHTML = html;
         el.className = className || '';
+    }
+
+    // ============================================================
+    // 标签页切换
+    // ============================================================
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        const panel = document.getElementById(tabId);
+        if (panel) panel.classList.add('active');
+        const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+        if (btn) btn.classList.add('active');
+        if (tabId === 'tab-manage') {
+            refreshFromGitHub();
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     document.addEventListener('DOMContentLoaded', init);
