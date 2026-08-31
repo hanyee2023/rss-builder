@@ -242,31 +242,31 @@
       "deepExtractMax": 12
     },
      {
-      "id": "maomi",
-      "name": "猫咪图库",
-      "url": "https://4595e9.top/#/",
-      "description": "猫咪图库分享",
-      "rule": "<div data-v-{*}\"\" class=\"information_message\">{%}</div></div> <div data-v-{*}\"\" class=\"text\"></div> <div data-v-{*}\"\" class=\"details_img\"><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div></div>",
+      "id": "yeshe",
+      "name": "夜社",
+      "url": "https://yeshex.com/filter/11.html",
+      "description": "提供最新发布、热门推荐等资源列表",
+      "rule": "<img class=\"lazy\" loading=\"lazy\" src=\"https://vods3.epobwsreb383eyq2bi.com/{%}/cover.{%}\" alt=\"{%}\" referrerpolicy=\"no-referrer\">",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
         "trimContent": true
       },
       "tpl": {
-        "title": "{%1}",
-        "link": "{%2}",
-        "content": "<img src=\"{%2}\" width=\"100%\">\n<img src=\"{%3}\" width=\"100%\">\n<img src=\"{%4}\" width=\"100%\">\n<img src=\"{%5}\" width=\"100%\">\n<img src=\"{%6}\" width=\"100%\">\n<img src=\"{%7}\" width=\"100%\">\n<img src=\"{%8}\" width=\"100%\">\n<img src=\"{%9}\" width=\"100%\">"
+        "title": "{%3}",
+        "link": "https://vods3.epobwsreb383eyq2bi.com/{%1}/play.m3u8",
+        "content": "视频地址：https://vods3.epobwsreb383eyq2bi.com/{%1}/play.m3u8\n<br>\n<img src=\"https://vods3.epobwsreb383eyq2bi.com/{%1}/cover.{%2}\" width=\"240\">"
       },
-      "maxItems": 50,
-      "updateInterval": "6h",
+      "maxItems": 30,
+      "updateInterval": "12h",
       "proxy": "puppeteer",
       "videoExtract": false,
       "videoUrlTpl": "",
       "videoRule": "",
       "imageRule": "",
       "videoSelect": "first",
-      "videoEmbed": true,
-      "deepExtractMax": 13
+      "videoEmbed": false,
+      "deepExtractMax": 12
     },
      {
       "id": "91jingxuan",
@@ -445,6 +445,87 @@
         "title": "{%2}",
         "link": "https://3-1.2026down.cc/{%1}/{%1}.mp4",
         "content": "<video src=\"https://3-1.2026down.cc/{%1}/{%1}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://img-1.2025pic.net/{%1}.jpg\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "huayuchuanmei",
+      "name": "华语传媒",
+      "url": "",
+      "description": "传媒视频",
+      "rule": "<div class=\"card\">\n        <a href=\"{*}\" target=\"_blank\">\n          <div class=\"thumb\">\n            <img data-src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%}/{%}/320x180/{%}.jpg\" class=\"lazy\" alt=\"\">\n            <span class=\"time\">{*}</span>\n          </div>\n          <p>{%}</p>\n        </a>\n      </div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%4}",
+        "link": "https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8",
+        "content": "视频链接：https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8\n<br>\n<img src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%1}/{%2}/320x180/{%3}.jpg\" width=\"100%\">"
+      },
+      "maxItems": 30,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "huahailou",
+      "name": "花海楼",
+      "url": "https://xn--0724-4-u32lw02bsa413rdgipp9csxa.fensetv50.cfd/?m=list&u=sh&k=short",
+      "description": "雄狮资源-短视频",
+      "rule": "<img class=\"thumb-img\" src=\"https://pppp.642p.com/images/{%}/cover.jpg\" alt=\"{%}\" loading=\"lazy\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "https://m3u8.73cdn.com/videos/{%1}/hls/index.m3u8",
+        "content": "视频地址：https://m3u8.73cdn.com/videos/{%1}/hls/index.m3u8\n<br>\n<img src=\"https://pppp.642p.com/images/{%1}/cover.jpg\" width=\"100%\">"
+      },
+      "maxItems": 30,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "fulijidi",
+      "name": "福利基地",
+      "url": "https://b53.freeshare58.com/",
+      "description": "福利基地是稀缺成人视图资源分享基地",
+      "rule": "<img decoding=\"async\" src=\"{%}\" class=\"thumb\" alt=\"{%}\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "https://b53.freeshare58.com{%1}",
+        "content": "<img src=\"https://b53.freeshare58.com{%1}\" width=\"100%\">"
       },
       "maxItems": 50,
       "updateInterval": "6h",
