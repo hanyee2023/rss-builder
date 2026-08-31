@@ -1,24 +1,31 @@
 {
   "feeds": [
     {
-      "id": "meirifenxiang",
-      "name": "Twitter@每日分享",
-      "url": "https://zamantika.com/profile/kathyreid367511",
-      "description": "视频分享",
-      "rule": "<div class=\"{*} tweet-text\">{%}</div>{*}<video src=\"{%}\" poster=\"{%}\" class=\"{*}\" muted=\"\" playsinline=\"\" preload=\"metadata\"></video>",
+      "id": "meizhitu",
+      "name": "美之图",
+      "url": "https://kkmzt.com/photo/",
+      "description": "美女图片",
+      "rule": "<a class=\"uk-inline u-thumb-v\" href=\"https://kkmzt.com/photo/{*}\"><img width=\"640\" height=\"960\" data-src=\"{*}\" data-srcset=\"{%}\" alt=\"{%}\" uk-img=\"\" src=\"{*}\" srcset=\"{*}\"></a>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
         "trimContent": true
       },
       "tpl": {
-        "title": "{%1}",
+        "title": "{%2}",
         "link": "{%2}",
-        "content": "<video src=\"{%2}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%3}\"></video>"
+        "content": "<img src=\"{%1}\" width=\"100%\">"
       },
       "maxItems": 50,
       "updateInterval": "6h",
-      "proxy": "puppeteer"
+      "proxy": false,
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": true,
+      "deepExtractMax": 13
     },
     {
       "id": "shangou",
@@ -180,12 +187,12 @@
       "updateInterval": "6h",
       "proxy": "puppeteer"
     },
-    {
-      "id": "slideshow",
-      "name": "Slideshow",
-      "url": "https://www.redlite.app/r/MassiveCock?sort=hot",
-      "description": "图潘",
-      "rule": "<a aria-label=\"view full image\" href=\"https://i.redd.it/{%}\" rel=\"noopener noreferrer\" target=\"_blank\"><img alt=\"{%}\" data-hint=\"image\" decoding=\"async\" id=\"{*}\" height=\"{*}\" loading=\"lazy\" {*}></a>",
+     {
+      "id": "youwu",
+      "name": "看尤物",
+      "url": "https://www.kanyouwu.com/xiezhen",
+      "description": "高清在线写真摄影分享平台",
+      "rule": "<img src=\"{*}\" data-src=\"{%}\" class=\"thumb\" alt=\"{%}\"{*}>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -193,12 +200,19 @@
       },
       "tpl": {
         "title": "{%2}",
-        "link": "https://siteproxy-1.j7o.com/default/https/i.redd.it/{%1}",
-        "content": "<img src=\"https://siteproxy-1.j7o.com/default/https/i.redd.it/{%1}\" width=\"250\">"
+        "link": "{%1}",
+        "content": "<img src=\"{%1}\" width=\"100%\">"
       },
       "maxItems": 50,
       "updateInterval": "6h",
-      "proxy": "puppeteer"
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
     },
     {
       "id": "meirentuku",
@@ -220,12 +234,12 @@
       "updateInterval": "6h",
       "proxy": "puppeteer"
     },
-    {
-      "id": "laowangzhenxuan",
-      "name": "老王甄选",
-      "url": "https://laowanggebi3333.xyz/",
-      "description": "写真话本",
-      "rule": "<div class=\"wp-block-template-part\">\n{*}<img decoding=\"async\" loading=\"lazy\" src=\"{%}\" width=\"{*}\" height=\"{*}\" class=\"external-img wp-post-image \"></a></figure>{*}\n<div class=\"{*}\" style=\"padding-left:10px\"><h2 style=\"font-size:15px;font-style:normal;font-weight:500;\" class=\"{*}\"><a href=\"{*}\" target=\"_self\">{%}</a></h2><style scoped=\"\">{*}</style></div>",
+   {
+      "id": "xiuren",
+      "name": "秀人网",
+      "url": "https://www.mingchu.cc/xiuren/",
+      "description": "精品写真图集",
+      "rule": "<img data-original=\"{%}\" width=\"{*}\" height=\"{*}\" alt=\"{%}\" src=\"{*}\">",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -234,18 +248,25 @@
       "tpl": {
         "title": "{%2}",
         "link": "{%1}",
-        "content": "<img src=\"{%1}\" width=\"250\">"
+        "content": "<img src=\"https:{%1}\" width=\"100%\">"
       },
       "maxItems": 50,
       "updateInterval": "6h",
-      "proxy": "puppeteer"
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
     },
-    {
-      "id": "zukong",
-      "name": "足控后花园",
-      "url": "https://www.twstalker.com/tadedacol",
-      "description": "美腿",
-      "rule": "<div class=\"activity-descp\">\n                                                        <p>{%}  </p>\n                                                        \n                                                            {*}\n                                                                                                                                        <div class=\"carousel-inner\">\n                                                                        <div class=\"carousel-item active\"><a class=\"thumbnail\" href=\"#\" data-image-id=\"{*}\" data-toggle=\"modal\" data-title=\"\" data-image=\"{%}\" data-target=\"#image-gallery\"> <img class=\"d-block w-100\" src=\"{*}\" alt=\"tadedacol tweet picture\"> </a></div><div class=\"carousel-item \"><a class=\"thumbnail\" href=\"#\" data-image-id=\"{*}\" data-toggle=\"modal\" data-title=\"\" data-image=\"{%}\" data-target=\"#image-gallery\"> <img class=\"d-block w-100\" src=\"{*}\" alt=\"tadedacol tweet picture\"> </a></div><div class=\"carousel-item \"><a class=\"thumbnail\" href=\"#\" data-image-id=\"{*}\" data-toggle=\"modal\" data-title=\"\" data-image=\"{%}\" data-target=\"#image-gallery\"> <img class=\"d-block w-100\" src=\"{*}\" alt=\"tadedacol tweet picture\"> </a></div><div class=\"carousel-item \"><a class=\"thumbnail\" href=\"#\" data-image-id=\"{*}\" data-toggle=\"modal\" data-title=\"\" data-image=\"{%}\" data-target=\"#image-gallery\"> <img class=\"d-block w-100\" src=\"{*}\" alt=\"tadedacol tweet picture\"> </a></div>",
+     {
+      "id": "maomi",
+      "name": "猫咪图库",
+      "url": "https://4595e9.top/#/",
+      "description": "猫咪图库分享",
+      "rule": "<div data-v-{*}\"\" class=\"information_message\">{%}</div></div> <div data-v-{*}\"\" class=\"text\"></div> <div data-v-{*}\"\" class=\"details_img\"><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div><div data-v-{*}\"\" class=\"details_img_box\" style=\"display: none;\"><img data-v-{*}\"\" alt=\"\" data-src=\"{%}\" src=\"./static/img/lodign.{*}.gif\" lazy=\"loading\"></div></div>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
@@ -254,11 +275,207 @@
       "tpl": {
         "title": "{%1}",
         "link": "{%2}",
-        "content": "<img src=\"{%2}\" width=\"100%\">\n<img src=\"{%3}\" width=\"100%\">\n<img src=\"{%4}\" width=\"100%\">\n<img src=\"{%5}\" width=\"100%\">"
+        "content": "<img src=\"{%2}\" width=\"100%\">\n<img src=\"{%3}\" width=\"100%\">\n<img src=\"{%4}\" width=\"100%\">\n<img src=\"{%5}\" width=\"100%\">\n<img src=\"{%6}\" width=\"100%\">\n<img src=\"{%7}\" width=\"100%\">\n<img src=\"{%8}\" width=\"100%\">\n<img src=\"{%9}\" width=\"100%\">"
       },
       "maxItems": 50,
       "updateInterval": "6h",
-      "proxy": "puppeteer"
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": true,
+      "deepExtractMax": 13
+    },
+     {
+      "id": "91jingxuan",
+      "name": "91精选",
+      "url": "https://770118.xyz/",
+      "description": "精选91短视频",
+      "rule": "<meta itemprop=\"author\" content=\"{*}\"><meta itemprop=\"name\" content=\"{*}\"><meta itemprop=\"description\" content=\"{%}\"><meta itemprop=\"duration\" content=\"{*}\"><meta itemprop=\"thumbnailUrl\" content=\"{%}\"><meta itemprop=\"contentURL\" content=\"{%}\"><meta itemprop=\"uploadDate\" content=\"{*}\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "{%3}",
+        "content": "<video src=\"{%3}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%2}\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "xiannvshe",
+      "name": "仙女社",
+      "url": "https://n1p1.com/",
+      "description": "提供最新事件动态",
+      "rule": "<img src=\"{*}\" data-src=\"{%}\" class=\"thumb\" alt=\"{%}\"{*}>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "{%1}",
+        "content": "<img src=\"{%1}\" width=\"100%\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "simimao",
+      "name": "丝密喵",
+      "url": "https://www.simimiao.com/cosplay/",
+      "description": "每日更新最新套图，满足宅男腿控的视觉享受。",
+      "rule": "<img class=\"post-thumb lazy{*}\" data-src=\"{%}?{*}\" alt=\"{%}\" src=\"{*}\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "{%1}",
+        "content": "<img src=\"{%1}\" width=\"100%\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+      {
+      "id": "yqzuole",
+      "name": "YQ作乐",
+      "url": "https://xn--0427-2lusevipsbs-of0zj38j4x0g.lusevip47.cfd/?m=list&u=sh&k=wife",
+      "description": "精品",
+      "rule": "<img src=\"https://pppp.642p.com/images/{%}/cover.jpg\" alt=\"{%}\" loading=\"lazy\" referrerpolicy=\"no-referrer\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "{%2}",
+        "content": "下载连接：https://m3u8.73cdn.com/newhd/{%1}/hls/index.m3u8\n<br>\n<img src=\"https://pppp.642p.com/images/{%1}/cover.jpg\" width=\"240\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "xfuliji",
+      "name": "Xfuliji",
+      "url": "https://xfuliji.org/",
+      "description": "浏览全球热门推特图片与视频",
+      "rule": "<img class=\"absolute w-full h-full object-cover top-0 left-0\" loading=\"lazy\" decoding=\"async\" fetchpriority=\"low\" alt=\"{%}\" src=\"https://p.12271227.xyz/{%}?{*}\" data-link=\"https://v.12271227.xyz/{%}\" data-type=\"video\" data-index=\"0\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%1}",
+        "link": "https://video.twimg.com/{%3}",
+        "content": "下载连接：https://video.twimg.com/{%3}\n<br>\n<img src=\"https://pbs.twimg.com/{%2}\" width=\"240\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "rebao",
+      "name": "91热爆",
+      "url": "https://xue1601.top:51000/list/50",
+      "description": "国产自拍 - 视频列表",
+      "rule": "<div class=\"thumb\">\n            <img data-src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%}/{%}/320x180/{%}.jpg\" class=\"{*}\"{*}>\n            <span class=\"time\">{*}</span>\n          </div>\n          <p>{%}</p>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%4}",
+        "link": "https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8",
+        "content": "视频连接：https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8\n<br>\n<img src=\"https://rbtp.wodexiaobaobei.com/contents/videos_screenshots/{%1}/{%2}/320x180/{%3}.jpg\" width=\"240\">"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "320lu",
+      "name": "320lu",
+      "url": "http://www.fabu11.cc:66/vod-type-id-1-pg-1.html",
+      "description": "自拍",
+      "rule": "<div class=\"citem film-box\">\n  <div class=\"citemtop\">\n    <a href=\"{*}\"><img width=\"280\" height=\"180\" src=\"https://img-1.2025pic.net/{%}.jpg\"></a>\n    <div class=\"citemtxt\">      <a class=\"citemtitle\" href=\"{*}\" title=\"{%}\">{*}</a>\n      <div class=\"citemtc\">\n           <span class=\"yy-icon yy-time\">时长：{%}</span> <div class=\"clear\"></div>\n      </div>\n    </div>\n  </div>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "https://3-1.2026down.cc/{%1}/{%1}.mp4",
+        "content": "<video src=\"https://3-1.2026down.cc/{%1}/{%1}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://img-1.2025pic.net/{%1}.jpg\"></video>"
+      },
+      "maxItems": 50,
+      "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
     }
   ]
 }
