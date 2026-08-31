@@ -1,31 +1,31 @@
 {
   "feeds": [
     {
-      "id": "meizhitu",
-      "name": "美之图",
-      "url": "https://kkmzt.com/photo/",
-      "description": "美女图片",
-      "rule": "<a class=\"uk-inline u-thumb-v\" href=\"https://kkmzt.com/photo/{*}\"><img width=\"640\" height=\"960\" data-src=\"{*}\" data-srcset=\"{%}\" alt=\"{%}\" uk-img=\"\" src=\"{*}\" srcset=\"{*}\"></a>",
+      "id": "duanshipin",
+      "name": "短视频",
+      "url": "https://xue342b.top:51000/list/45",
+      "description": "短视频列表",
+      "rule": "<div class=\"thumb\">\n            <img data-src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%}/{%}/320x180/{%}.jpg\" class=\"{*}\"{*}>\n            <span class=\"time\">{*}</span>\n          </div>\n          <p>{%}</p>",
       "options": {
         "stripHtml": true,
         "decodeEntities": true,
         "trimContent": true
       },
       "tpl": {
-        "title": "{%2}",
-        "link": "{%2}",
-        "content": "<img src=\"{%1}\" width=\"100%\">"
+        "title": "{%4}",
+        "link": "https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8",
+        "content": "视频连接：https://m2.kdamao.com/hls/contents/videos/{%1}/{%2}/{%2}.mp4/index.m3u8\n<br>\n<img src=\"https://rbtp.woikimage.com/contents/videos_screenshots/{%1}/{%2}/320x180/{%3}.jpg\" width=\"240\">"
       },
       "maxItems": 50,
       "updateInterval": "6h",
-      "proxy": false,
+      "proxy": "puppeteer",
       "videoExtract": false,
       "videoUrlTpl": "",
       "videoRule": "",
       "imageRule": "",
       "videoSelect": "first",
-      "videoEmbed": true,
-      "deepExtractMax": 13
+      "videoEmbed": false,
+      "deepExtractMax": 12
     },
     {
       "id": "shangou",
@@ -82,26 +82,6 @@
         "title": "{%1}",
         "link": "{%3}",
         "content": "<video src=\"{%3}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%2}\"></video>"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": "puppeteer"
-    },
-    {
-      "id": "chuchouquan",
-      "name": "Twitter@除臭犬",
-      "url": "https://carryfeed.com/?url=chuchouquan",
-      "description": "视频分享",
-      "rule": "<article class=\"profile-feed-item\"><div class=\"profile-feed-author\">{*}</div><p>{%}</p>{*}<img src=\"https://pbs.twimg.com/{%}_thumb/{%}/img/{%}.jpg\" alt=\"Media preview\">{*}<a class=\"profile-feed-media-download\" href=\"/download?url=https%3A%2F%2Fvideo.twimg.com%2F{*}%2F{*}%2Fvid%2Favc1%2F{%}%2F{*}.mp4%3Ftag%3D{*}&amp;filename={%}.mp4\" aria-label=\"Download media 1\">{*}</a></div></div></article>",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%1}",
-        "link": "https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4",
-        "content": "<video src=\"https://video.twimg.com/{%2}/{%3}/vid/avc1/{%5}/{%6}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://pbs.twimg.com/{%2}_thumb/{%3}/img/{%4}.jpg\"></video>"
       },
       "maxItems": 50,
       "updateInterval": "6h",
@@ -399,7 +379,7 @@
      {
       "id": "xfuliji",
       "name": "Xfuliji",
-      "url": "https://xfuliji.org/",
+      "url": "https://xfuliji.20490060.xyz/",
       "description": "浏览全球热门推特图片与视频",
       "rule": "<img class=\"absolute w-full h-full object-cover top-0 left-0\" loading=\"lazy\" decoding=\"async\" fetchpriority=\"low\" alt=\"{%}\" src=\"https://p.12271227.xyz/{%}?{*}\" data-link=\"https://v.12271227.xyz/{%}\" data-type=\"video\" data-index=\"0\">",
       "options": {
