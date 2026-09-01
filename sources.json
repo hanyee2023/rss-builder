@@ -458,33 +458,6 @@
       "deepExtractMax": 12
     },
      {
-      "id": "5X5X",
-      "name": "5X5X",
-      "url": "https://www.hfywbt.com/category/1/",
-      "description": "大陆视频",
-      "rule": "<img class=\"card-img lazy-loaded\" alt=\"{%}\" decoding=\"async\" src=\"https://jhfduadgiyhas.com:1443/p2/{%}.jpg\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%1}",
-        "link": "https://ttikkhdgtgsjuy.com:1443/v/{%2}/index.m3u8",
-        "content": "视频地址：https://ttikkhdgtgsjuy.com:1443/v/{%2}/index.m3u8\n<br>\n<img src=\"https://jhfduadgiyhas.com:1443/p2/{%2}.jpg\" width=\"100%\">"
-      },
-      "maxItems": 30,
-      "updateInterval": "6h",
-      "proxy": "puppeteer",
-      "videoExtract": false,
-      "videoUrlTpl": "",
-      "videoRule": "",
-      "imageRule": "",
-      "videoSelect": "first",
-      "videoEmbed": false,
-      "deepExtractMax": 12
-    },
-     {
       "id": "huahailou",
       "name": "花海楼",
       "url": "https://xn--0724-4-u32lw02bsa413rdgipp9csxa.fensetv50.cfd/?m=list&u=sh&k=short",
@@ -501,33 +474,6 @@
         "content": "视频地址：https://m3u8.73cdn.com/videos/{%1}/hls/index.m3u8\n<br>\n<img src=\"https://pppp.642p.com/images/{%1}/cover.jpg\" width=\"100%\">"
       },
       "maxItems": 30,
-      "updateInterval": "6h",
-      "proxy": "puppeteer",
-      "videoExtract": false,
-      "videoUrlTpl": "",
-      "videoRule": "",
-      "imageRule": "",
-      "videoSelect": "first",
-      "videoEmbed": false,
-      "deepExtractMax": 12
-    },
-     {
-      "id": "fulijidi",
-      "name": "福利基地",
-      "url": "https://b53.freeshare58.com/",
-      "description": "福利基地是稀缺成人视图资源分享基地",
-      "rule": "<img decoding=\"async\" src=\"{%}\" class=\"thumb\" alt=\"{%}\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%2}",
-        "link": "https://b53.freeshare58.com{%1}",
-        "content": "<img src=\"https://b53.freeshare58.com{%1}\" width=\"100%\">"
-      },
-      "maxItems": 50,
       "updateInterval": "6h",
       "proxy": "puppeteer",
       "videoExtract": false,
