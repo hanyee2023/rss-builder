@@ -377,33 +377,6 @@
       "deepExtractMax": 12
     },
      {
-      "id": "xfuliji",
-      "name": "Xfuliji",
-      "url": "https://xfuliji.20490060.xyz/",
-      "description": "浏览全球热门推特图片与视频",
-      "rule": "<img class=\"absolute w-full h-full object-cover top-0 left-0\" loading=\"lazy\" decoding=\"async\" fetchpriority=\"low\" alt=\"{%}\" src=\"https://p.12271227.xyz/{%}?{*}\" data-link=\"https://v.12271227.xyz/{%}\" data-type=\"video\" data-index=\"0\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%1}",
-        "link": "https://video.twimg.com/{%3}",
-        "content": "下载连接：https://video.twimg.com/{%3}\n<br>\n<img src=\"https://pbs.twimg.com/{%2}\" width=\"240\">"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": "puppeteer",
-      "videoExtract": false,
-      "videoUrlTpl": "",
-      "videoRule": "",
-      "imageRule": "",
-      "videoSelect": "first",
-      "videoEmbed": false,
-      "deepExtractMax": 12
-    },
-     {
       "id": "rebao",
       "name": "91热爆",
       "url": "https://xue1601.top:51000/list/50",
@@ -433,8 +406,8 @@
      {
       "id": "320lu",
       "name": "320lu",
-      "url": "http://www.fabu11.cc:66/vod-type-id-1-pg-1.html",
-      "description": "自拍",
+      "url": "http://www.fabu33.cc:66/vod-type-id-1-pg-1.html",
+      "description": "自拍视频",
       "rule": "<div class=\"citem film-box\">\n  <div class=\"citemtop\">\n    <a href=\"{*}\"><img width=\"280\" height=\"180\" src=\"https://img-1.2025pic.net/{%}.jpg\"></a>\n    <div class=\"citemtxt\">      <a class=\"citemtitle\" href=\"{*}\" title=\"{%}\">{*}</a>\n      <div class=\"citemtc\">\n           <span class=\"yy-icon yy-time\">时长：{%}</span> <div class=\"clear\"></div>\n      </div>\n    </div>\n  </div>",
       "options": {
         "stripHtml": true,
@@ -443,10 +416,10 @@
       },
       "tpl": {
         "title": "{%2}",
-        "link": "https://3-1.2026down.cc/{%1}/{%1}.mp4",
-        "content": "<video src=\"https://3-1.2026down.cc/{%1}/{%1}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://img-1.2025pic.net/{%1}.jpg\"></video>"
+        "link": "https://7-5.2026down.cc/{%1}/{%1}.mp4",
+        "content": "<video src=\"https://7-5.2026down.cc/{%1}/{%1}.mp4\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"https://spy.2133.dpdns.org/default/https/img-1.2025pic.net/{%1}.jpg\"></video>"
       },
-      "maxItems": 50,
+      "maxItems": 30,
       "updateInterval": "6h",
       "proxy": "puppeteer",
       "videoExtract": false,
