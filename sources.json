@@ -115,33 +115,6 @@
       "proxy": "puppeteer"
     },
      {
-      "id": "99shipin",
-      "name": "99短视频",
-      "url": "https://99.99t.rest/",
-      "description": "短视频",
-      "rule": "<video src=\"{*}\" poster=\"https://99img2.99ttt.xyz/contents/videos_screenshots/{%}/{%}/preview.jpg\" loop=\"\" muted=\"\" playsinline=\"\" preload=\"metadata\"></video>",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "cos视频@{%2}",
-        "link": "https://customer-ylpcom.hlsdelivery.net//hls/contents/videos/{%1}/{%2}/{%2}_720p.mp4/index.m3u8",
-        "content": "视频地址：https://customer-ylpcom.hlsdelivery.net//hls/contents/videos/{%1}/{%2}/{%2}_720p.mp4/index.m3u8\n<br>\n<img src=\"https://99img2.99ttt.xyz/contents/videos_screenshots/{%1}/{%2}/preview.jpg\" width=\"240\">"
-      },
-      "maxItems": 50,
-      "updateInterval": "6h",
-      "proxy": "puppeteer",
-      "videoExtract": false,
-      "videoUrlTpl": "",
-      "videoRule": "",
-      "imageRule": "",
-      "videoSelect": "first",
-      "videoEmbed": false,
-      "deepExtractMax": 12
-    },
-     {
       "id": "youwu",
       "name": "看尤物",
       "url": "https://www.kanyouwu.com/xiezhen",
@@ -395,6 +368,33 @@
       },
       "maxItems": 30,
       "updateInterval": "6h",
+      "proxy": "puppeteer",
+      "videoExtract": false,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "",
+      "videoSelect": "first",
+      "videoEmbed": false,
+      "deepExtractMax": 12
+    },
+     {
+      "id": "massive",
+      "name": "Massivecock",
+      "url": "https://reddtastic.com/r/massivecock?type=video",
+      "description": "from reddit.",
+      "rule": "<video class=\"post__video\" controls=\"\" height=\"{*}\" loop=\"\" poster=\"{%}\" preload=\"none\" width=\"{*}\" style=\"{*}\"><source src=\"{*}\" type=\"application/vnd.apple.mpegurl\"><source src=\"{%}\" type=\"video/mp4\"></video></div><a class=\"post__title popup-trigger\" href=\"{*}\">{%}</a>",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%3}",
+        "link": "{%2}",
+        "content": "<video src=\"{%2}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%1}\"></video>"
+      },
+      "maxItems": 20,
+      "updateInterval": "12h",
       "proxy": "puppeteer",
       "videoExtract": false,
       "videoUrlTpl": "",
