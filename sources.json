@@ -437,6 +437,33 @@
       "videoSelect": "first",
       "videoEmbed": false,
       "deepExtractMax": 12
+    },
+    {
+      "id": "hotzoon",
+      "name": "热图",
+      "url": "https://www.hotzone.com/?sort=new",
+      "description": "写真",
+      "rule": "<img src=\"/thumb/{%}\" alt=\"{%}\" loading=\"lazy\">",
+      "options": {
+        "stripHtml": true,
+        "decodeEntities": true,
+        "trimContent": true
+      },
+      "tpl": {
+        "title": "{%2}",
+        "link": "https://www.hotzone.com/article/{%1}",
+        "content": "{%3}"
+      },
+      "maxItems": 10,
+      "updateInterval": "daily",
+      "proxy": "puppeteer",
+      "videoExtract": true,
+      "videoUrlTpl": "",
+      "videoRule": "",
+      "imageRule": "<img id=\"photo-{*}\" src=\"{%}\" alt=\"{*}\" loading=\"lazy\" onclick=\"goPhoto{*}\">",
+      "videoSelect": "all",
+      "videoEmbed": false,
+      "deepExtractMax": 8
     }
   ]
 }
