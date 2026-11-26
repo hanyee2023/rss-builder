@@ -463,7 +463,8 @@
       "imageRule": "<img id=\"photo-{*}\" src=\"{%}\" alt=\"{*}\" loading=\"lazy\" onclick=\"goPhoto{*}\">",
       "videoSelect": "all",
       "videoEmbed": false,
-      "deepExtractMax": 8
+      "deepExtractMax": 8,
+      "imageMax": 8
     }
   ]
 }
