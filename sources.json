@@ -331,33 +331,6 @@
       "deepExtractMax": 12
     },
      {
-      "id": "huahailou",
-      "name": "花海楼",
-      "url": "https://xn--0724-4-u32lw02bsa413rdgipp9csxa.fensetv50.cfd/?m=list&u=sh&k=short",
-      "description": "雄狮资源-短视频",
-      "rule": "<img class=\"thumb-img\" src=\"https://pppp.642p.com/images/{%}/cover.jpg\" alt=\"{%}\" loading=\"lazy\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%2}",
-        "link": "https://m3u8.73cdn.com/videos/{%1}/hls/index.m3u8",
-        "content": "视频地址：https://m3u8.73cdn.com/videos/{%1}/hls/index.m3u8\n<br>\n<img src=\"https://pppp.642p.com/images/{%1}/cover.jpg\" width=\"100%\">"
-      },
-      "maxItems": 30,
-      "updateInterval": "6h",
-      "proxy": "puppeteer",
-      "videoExtract": false,
-      "videoUrlTpl": "",
-      "videoRule": "",
-      "imageRule": "",
-      "videoSelect": "first",
-      "videoEmbed": false,
-      "deepExtractMax": 12
-    },
-     {
       "id": "massive",
       "name": "Massivecock",
       "url": "https://reddtastic.com/r/massivecock?type=video",
@@ -412,34 +385,7 @@
       "deepExtractMax": 12
     },
     {
-      "id": "xclyp",
-      "name": "XCLYP排行",
-      "url": "https://xclyp.com/?lang=zh-CN",
-      "description": "x下载排行",
-      "rule": "<article class=\"{*}\" data-video-id=\"{*}\" data-sf=\"home\" data-og=\"m\" data-tk=\"{*}\" data-score=\"{*}\" data-vurl=\"{%}\" {*}>\n    <a href=\"https://xclyp.com/v/{*}\" class=\"block overflow-hidden relative bg-ink-700\">\n                    \n            \n            <img src=\"{%}?format={*}\" alt=\"{%}\" loading=\"{*}\" decoding=\"{*}\" fetchpriority=\"{*}\" class=\"{*}\">",
-      "options": {
-        "stripHtml": true,
-        "decodeEntities": true,
-        "trimContent": true
-      },
-      "tpl": {
-        "title": "{%13}",
-        "link": "{%1}",
-        "content": "<video src=\"{%1}\" class=\"relative size-full object-cover\" playsinline=\"\" poster=\"{%2}\"></video>"
-      },
-      "maxItems": 30,
-      "updateInterval": "12h",
-      "proxy": "puppeteer",
-      "videoExtract": false,
-      "videoUrlTpl": "",
-      "videoRule": "",
-      "imageRule": "",
-      "videoSelect": "first",
-      "videoEmbed": false,
-      "deepExtractMax": 12
-    },
-    {
-      "id": "feed-1",
+      "id": "hotzoon",
       "name": "热图",
       "url": "https://www.hotzone.com/?sort=new",
       "description": "写真",
@@ -454,7 +400,7 @@
         "link": "https://www.hotzone.com/article/{%1}",
         "content": "{%3}"
       },
-      "maxItems": 50,
+      "maxItems": 15,
       "updateInterval": "daily",
       "proxy": false,
       "videoExtract": true,
@@ -463,7 +409,7 @@
       "imageRule": "<img id=\"photo-{*}\" src=\"{%}\" alt=\"{*}\" loading=\"lazy\" onclick=\"goPhoto({*})\">",
       "videoSelect": "first",
       "videoEmbed": false,
-      "deepExtractMax": 10,
+      "deepExtractMax": 15,
       "imageMax": 8
     }
   ]
