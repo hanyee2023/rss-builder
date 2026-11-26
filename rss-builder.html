@@ -17,43 +17,60 @@
             color: #333;
             max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f7fa;
+            padding: 24px 20px;
+            background: linear-gradient(160deg, #f0f4fa 0%, #e8eef7 45%, #eef2f9 100%);
         }
         .container {
             background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            border-radius: 16px;
+            padding: 34px 36px;
+            box-shadow: 0 4px 24px rgba(29, 57, 105, 0.08), 0 1px 4px rgba(29, 57, 105, 0.05);
         }
         .header {
             text-align: center;
-            margin-bottom: 26px;
-            padding-bottom: 18px;
-            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eef1f6;
         }
         .header h1 {
             color: #1a1a2e;
-            margin-bottom: 6px;
-            font-size: 24px;
+            margin-bottom: 8px;
+            font-size: 26px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 10px;
+            background: linear-gradient(135deg, #1677ff, #4096ff);
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 999px;
+            letter-spacing: 0.5px;
+            vertical-align: middle;
+            transform: translateY(-3px);
         }
         .header p {
             color: #6c757d;
             font-size: 13px;
         }
         .step-section {
-            margin-bottom: 24px;
-            padding: 20px 22px;
-            border: 1px solid #e4e7ed;
-            border-radius: 10px;
-            background-color: #fafbfc;
+            margin-bottom: 22px;
+            padding: 22px 24px;
+            border: 1px solid #eef1f6;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: 0 1px 6px rgba(29, 57, 105, 0.05);
         }
         .step-title {
             font-size: 16px;
             color: #1677ff;
             margin-bottom: 14px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f3f8;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -63,11 +80,12 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #1677ff;
+            background: linear-gradient(135deg, #1677ff, #4096ff);
             color: white;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
+            box-shadow: 0 2px 6px rgba(22, 119, 255, 0.35);
             font-size: 13px;
             font-weight: 600;
         }
@@ -172,7 +190,7 @@
         button {
             padding: 8px 16px;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
@@ -189,12 +207,12 @@
         }
         button:active { transform: translateY(0); }
         button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-        .btn-primary { background: #1677ff; color: white; }
+        .btn-primary { background: linear-gradient(135deg, #1677ff, #3d94ff); color: white; box-shadow: 0 2px 6px rgba(22, 119, 255, 0.3); }
         .btn-primary:hover { background: #4096ff; }
-        .btn-success { background: #52c41a; color: white; }
+        .btn-success { background: linear-gradient(135deg, #52c41a, #6fda3a); color: white; box-shadow: 0 2px 6px rgba(82, 196, 26, 0.3); }
         .btn-success:hover { background: #73d13d; }
-        .btn-secondary { background: #6c757d; color: white; }
-        .btn-secondary:hover { background: #868e96; }
+        .btn-secondary { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; }
+        .btn-secondary:hover { background: #e9ecef; }
         .status-bar {
             display: flex;
             justify-content: space-between;
@@ -235,25 +253,6 @@
             font-size: 11.5px;
             color: #d63384;
         }
-        .gh-config {
-            background: #fffbe6;
-            border: 1px solid #ffe58f;
-            border-radius: 7px;
-            padding: 12px 14px;
-            margin-top: 12px;
-        }
-        .gh-config h4 {
-            color: #d46b08;
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        .gh-config-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-        .gh-config-row .form-group { min-width: 140px; }
         .checkbox-group {
             display: flex;
             gap: 14px;
@@ -325,7 +324,7 @@
             margin-top: 6px;
         }
         .note li { margin-bottom: 3px; }
-    </style>
+
         /* 第三步内部子标签：列表页 / 详情页 */
         .sub-tab-nav {
             display: flex;
@@ -374,7 +373,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>RSS 自定义订阅生成器</h1>
+            <h1>RSS 自定义订阅生成器 <span class="version-badge">v1.2</span></h1>
             <p>粘贴源码 → 提取内容 → 生成 sources.json → 粘贴到 GitHub 仓库</p>
         </div>
 
@@ -576,21 +575,6 @@
                 </div>
             </div>
 
-            <!-- 仓库配置（仅用于自动合并已有订阅源） -->
-            <div class="gh-config">
-                <h4>GitHub 仓库配置（可选，用于自动合并已有订阅源）</h4>
-                <div class="gh-config-row">
-                    <div class="form-group">
-                        <label for="ghUsername">GitHub 用户名</label>
-                        <input type="text" id="ghUsername" value="hanyee2023" placeholder="your-username">
-                    </div>
-                    <div class="form-group">
-                        <label for="ghRepo">仓库名</label>
-                        <input type="text" id="ghRepo" value="rss-builder" placeholder="your-repo">
-                    </div>
-                </div>
-                <div class="info-message">填写后，「生成 sources.json」会自动读取仓库中已有的 sources.json 并把新订阅源合并进去，复制出来的就是<strong>完整配置</strong>，直接整体覆盖粘贴即可。不填则只生成当前这一个订阅源的 JSON。</div>
-            </div>
         </div>
 
         <!-- 第四步：生成配置 -->
@@ -600,14 +584,14 @@
                 生成 sources.json 配置
             </h2>
             <div class="format-note">
-                <strong>说明：</strong> 点击「生成 sources.json」，把生成的 JSON 内容整体复制到 GitHub 仓库的 <code>sources.json</code> 文件中，提交后 GitHub Actions 会自动生成 RSS。
+                <strong>说明：</strong> 这里只生成<strong>当前订阅源</strong>的一段配置，复制后粘贴到 GitHub 仓库的 <code>sources.json</code> 中，提交后 GitHub Actions 会自动生成 RSS。
             </div>
             <div class="btn-container">
                 <button id="generateJsonBtn" class="btn-primary">生成 sources.json</button>
                 <button id="copyJsonBtn" class="btn-success">复制 JSON</button>
                 <button id="downloadJsonBtn" class="btn-secondary">下载 sources.json</button>
             </div>
-            <div class="status-bar">
+            <div class="status-bar" id="jsonStatusBar" style="display: none;">
                 <div id="jsonStatus"></div>
             </div>
             <label>sources.json 预览</label>
@@ -638,9 +622,10 @@
             <div class="note">
                 <strong>部署步骤：</strong>
                 <ol>
-                    <li>将生成的 <code>sources.json</code> 内容整体复制，粘贴到 GitHub 仓库的同名文件（覆盖保存）</li>
-                    <li>提交更改，等待 GitHub Actions 自动执行（也可到 Actions 页面手动 Run workflow）</li>
-                    <li>订阅链接格式：<code>https://用户名.github.io/仓库名/feeds/feed-id.xml</code></li>
+                    <li>点击「生成 sources.json」，下方预览就是当前订阅源的配置（只含这一个源）</li>
+                    <li>点「复制 JSON」，粘贴到 GitHub 仓库的 <code>sources.json</code></li>
+                    <li>如果仓库里<strong>已经有其他订阅源</strong>：把新生成的 <code>{ ... }</code> 这一项追加到原文件 <code>"feeds": [ ... ]</code> 数组里（用逗号分隔），不要整段覆盖</li>
+                    <li>提交后 GitHub Actions 自动运行，订阅链接：<code>https://用户名.github.io/仓库名/feeds/feed-id.xml</code></li>
                 </ol>
             </div>
         </div>
@@ -658,14 +643,11 @@
         currentJsonConfig: null,
     };
 
-    const GH_CONFIG_KEY = 'rss_builder_gh_config';
-
     // ============================================================
     // 初始化
     // ============================================================
     function init() {
         bindEvents();
-        loadGhConfig();
         updateSourceLength();
     }
 
@@ -695,13 +677,8 @@
             setStatus('extractStatus', '', '');
         });
 
-        // 仓库配置（用于合并已有订阅源）
-        ['ghUsername', 'ghRepo'].forEach(id => {
-            document.getElementById(id).addEventListener('input', saveGhConfig);
-        });
-
         // 第四步
-        document.getElementById('generateJsonBtn').addEventListener('click', () => generateJsonConfig(true));
+        document.getElementById('generateJsonBtn').addEventListener('click', () => generateJsonConfig());
         document.getElementById('copyJsonBtn').addEventListener('click', copyJsonConfig);
         document.getElementById('downloadJsonBtn').addEventListener('click', downloadJsonConfig);
     }
@@ -960,76 +937,18 @@
     // 第四步：生成 sources.json
     // ============================================================
 
-    // 缓存已读取的订阅源列表，避免连续添加时需要每次请求 GitHub
-    let cachedExistingFeeds = null;
-    let lastFetchError = null; // 记录最近一次从 GitHub 拉取列表是否出错
-
-    // 从 GitHub 读取已有的订阅源列表（带缓存）
-    async function fetchExistingFeeds(forceRefresh = false) {
-        // 强制刷新时清空缓存，重新拉取
-        if (forceRefresh) {
-            cachedExistingFeeds = null;
-            lastFetchError = null;
-        }
-        // 非强制刷新且有缓存就用缓存
-        if (cachedExistingFeeds) {
-            return cachedExistingFeeds;
-        }
-
-        const ghUsername = document.getElementById('ghUsername').value.trim();
-        const ghRepo = document.getElementById('ghRepo').value.trim();
-        if (!ghUsername || !ghRepo) { lastFetchError = '未配置 GitHub 用户名/仓库'; return []; }
-
-        try {
-            const ghFileUrl = `https://raw.githubusercontent.com/${ghUsername}/${ghRepo}/main/sources.json?t=${Date.now()}`;
-            const resp = await fetch(ghFileUrl);
-            if (resp.ok) {
-                const existing = await resp.json();
-                if (existing.feeds && Array.isArray(existing.feeds)) {
-                    cachedExistingFeeds = JSON.parse(JSON.stringify(existing.feeds)); // 深拷贝
-                    lastFetchError = null;
-                    return cachedExistingFeeds;
-                }
-                // 文件存在但无 feeds 数组
-                cachedExistingFeeds = [];
-                return cachedExistingFeeds;
-            }
-            lastFetchError = `GitHub 返回 ${resp.status}（仓库名/分支是否正确？文件是否公开？）`;
-        } catch (e) {
-            lastFetchError = e.message || '网络错误';
-            console.warn('读取已有 sources.json 失败:', e);
-        }
-        return cachedExistingFeeds || [];
-    }
-
-    // 生成 sources.json：读取仓库已有配置，合并/替换当前订阅源
-    async function generateJsonConfig(appendMode = true) {
+    // 生成 sources.json（仅包含当前订阅源）
+    function generateJsonConfig() {
         const feedConfig = buildFeedConfigFromForm();
         if (!feedConfig) return;
 
-        let feeds;
-        if (appendMode) {
-            // 尝试从 GitHub 读取已有 sources.json（已配置用户名/仓库时）
-            const existingFeeds = await fetchExistingFeeds(false);
-            const newId = feedConfig.id;
-            const existIdx = existingFeeds.findIndex(f => f.id === newId);
-            if (existIdx >= 0) {
-                existingFeeds[existIdx] = feedConfig;
-            } else {
-                existingFeeds.push(feedConfig);
-            }
-            feeds = existingFeeds;
-
-            const total = feeds.length;
-            setStatus('jsonStatus', existIdx >= 0
-                ? `已更新订阅源「${newId}」，当前共 ${total} 个，请复制下方完整 JSON 覆盖粘贴到 GitHub`
-                : `已追加订阅源「${newId}」，当前共 ${total} 个，请复制下方完整 JSON 覆盖粘贴到 GitHub`, 'status-success');
-        } else {
-            feeds = [feedConfig];
-        }
-
-        state.currentJsonConfig = { feeds };
+        state.currentJsonConfig = { feeds: [feedConfig] };
         document.getElementById('jsonPreview').textContent = JSON.stringify(state.currentJsonConfig, null, 2);
+        const bar = document.getElementById('jsonStatusBar');
+        if (bar) bar.style.display = 'flex';
+        setStatus('jsonStatus',
+            `已生成订阅源「${feedConfig.id}」的配置，请复制下方 JSON 粘贴到 GitHub 仓库的 sources.json`,
+            'status-success');
     }
 
     function copyJsonConfig() {
@@ -1045,24 +964,6 @@
         a.href = url; a.download = 'sources.json';
         document.body.appendChild(a); a.click();
         document.body.removeChild(a); URL.revokeObjectURL(url);
-    }
-
-    // ============================================================
-    // GitHub配置本地存储
-    // ============================================================
-    function saveGhConfig() {
-        localStorage.setItem(GH_CONFIG_KEY, JSON.stringify({
-            username: document.getElementById('ghUsername').value.trim(),
-            repo: document.getElementById('ghRepo').value.trim(),
-        }));
-    }
-
-    function loadGhConfig() {
-        try {
-            const config = JSON.parse(localStorage.getItem(GH_CONFIG_KEY) || '{}');
-            if (config.username) document.getElementById('ghUsername').value = config.username;
-            if (config.repo) document.getElementById('ghRepo').value = config.repo;
-        } catch (e) {}
     }
 
     // ============================================================
