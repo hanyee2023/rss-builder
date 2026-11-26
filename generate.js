@@ -813,7 +813,12 @@ async function mapWithConcurrency(items, limit, fn) {
 
 // 详情页抓取：绝不启动 Puppeteer（只取初始 HTML 里的 meta/jsonld，速度远快于渲染）
 function fetchDetailPage(targetUrl, proxyConfig) {
-    if (proxyConfig && typeof proxyConfig === 'string' && proxyConfig.length > 0) {
+    // proxy === 'puppeteer' 表示列表页用浏览器渲染，详情页仍走直连抓初始 HTML
+    if (proxyConfig === 'puppeteer') {
+        return fetchDirect(targetUrl, 0);
+    }
+    // 只有配置了真正的 HTTP 代理地址（http/https 开头）才走代理
+    if (proxyConfig && typeof proxyConfig === 'string' && /^https?:\/\//.test(proxyConfig)) {
         return fetchWithProxy(targetUrl, 0, proxyConfig);
     }
     return fetchDirect(targetUrl, 0);
