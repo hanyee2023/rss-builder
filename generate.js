@@ -1065,6 +1065,9 @@ async function enrichWithVideoLinks(rows, ctx) {
             const seenImg = new Set();
             images = images.filter(u => { const k = (u || '').trim(); if (!k || seenImg.has(k)) return false; seenImg.add(k); return true; });
             images = images.map(u => { try { return new URL(u, absUrl).href; } catch (e) { return u; } }).filter(Boolean);
+            // 每条目最多图片数（imageMax > 0 时截断，0/留空 = 不限制）
+            const imageMax = parseInt(feed.imageMax, 10);
+            if (imageMax > 0) images = images.slice(0, imageMax);
             if (images.length) row._images = images;
 
         } catch (e) {
